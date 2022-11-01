@@ -1,0 +1,67 @@
+# !env bash
+
+## Get data for a specified year, and optionally a specific day.
+
+usage() {
+  echo "Usage: aoc get YEAR [DAY]"
+  exit 1
+}
+
+data_filename() {
+  local year=$1 day=$2
+  echo $( printf "data/%s/%02d.txt" "$year" "$day" )
+}
+
+fetch() {
+  local year=$1 day=$2
+  local fn=$( data_filename $year $day )
+  local outfile=$( mktemp )
+  local status_code
+
+  status_code=$(
+    curl --request GET \
+         --header "Cookie: session=$( cat ./.token )" \
+         --location \
+         --output "${outfile}" \
+         --show-error \
+         --silent \
+         --write-out "%{http_code}" \
+         --url "https://adventofcode.com/${year}/day/${day}/input"
+  )
+  if [[ "${status_code}" = "200" ]]; then
+    mkdir -p "$( dirname '$fn' )"
+    mv "${outfile}" "${fn}"
+  else
+    echo "could not fetch data for ${year} day ${day}: HTTP status code ${status_code}"
+  fi
+}
+
+maybe_fetch() {
+  local year=$1 day=$2
+  local fn=$( data_filename $year $day )
+
+  if [[ ! -f "$fn" ]]; then
+    fetch $year $day
+  else
+    echo "data for ${year} day ${day} has already been fetched; skipping"
+  fi
+}
+
+YEAR=$1
+DAY=$2
+
+if [[ -z "$YEAR" ]]; then
+  echo "missing year"
+  echo ""
+  usage
+fi
+
+if [[ -z "$DAY" ]]; then
+  maybe_fetch "$YEAR" 1
+  for day in {2..25}; do
+    sleep 2
+    maybe_fetch "$YEAR" "$day"
+  done
+else
+  maybe_fetch "$YEAR" "$DAY"
+fi
