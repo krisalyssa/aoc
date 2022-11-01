@@ -9,7 +9,7 @@ usage() {
 
 data_filename() {
   local year=$1 day=$2
-  echo $( printf "data/%s/%02d.txt" "$year" "$day" )
+  echo $( printf "years/%s/data/%02d.txt" "$year" "$day" )
 }
 
 fetch() {
