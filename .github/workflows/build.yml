@@ -22,7 +22,8 @@ jobs:
 
       - name: build images
         run: |
-          for filename in $( find lang -type f -name 'Dockerfile' ); do
+          git diff --quiet lang \
+          || for filename in $( find lang -type f -name 'Dockerfile' ); do
             imagename=$(basename $( dirname ${filename} ) )
             tagname=ghcr.io/craigcottingham/aoc/aoc-${imagename}
 
