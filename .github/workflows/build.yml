@@ -24,11 +24,13 @@ jobs:
         run: |
           for filename in $( find lang -type f -name 'Dockerfile' ); do
             imagename=$(basename $( dirname ${filename} ) )
+            tagname=ghcr.io/craigcottingham/aoc/aoc-${imagename}:latest
+
             docker build \
               -f ${filename} \
-              -t ghcr.io/CraigCottingham/aoc/aoc-${imagename}:latest \
+              -t ${tagname} \
               --build-arg BUILDKIT_INLINE_CACHE \
-              --cache-from ghcr.io/CraigCottingham/aoc/aoc-${imagename}:latest \
+              --cache-from ${tagname} \
               .
           done
         env:
