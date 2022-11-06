@@ -32,6 +32,8 @@ jobs:
               --build-arg BUILDKIT_INLINE_CACHE \
               --cache-from ${tagname} \
               .
+
+            docker push ${tagname}:latest
           done
         env:
           BUILDKIT_INLINE_CACHE: 1
