@@ -1,0 +1,41 @@
+name: build-images
+run-name: build Docker images
+on:
+  push:
+    branches: [main]
+    paths:
+      - lang/**
+jobs:
+  build:
+    name: build images
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out most recent commit
+        uses: actions/checkout@v2
+
+      - name: auth with docker
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build images
+        run: |
+          git diff --quiet lang \
+          || for filename in $( find lang -type f -name 'Dockerfile' ); do
+            imagename=$(basename $( dirname ${filename} ) )
+            tagname=ghcr.io/craigcottingham/aoc/aoc-${imagename}
+
+            docker build \
+              -f ${filename} \
+              -t ${tagname}:latest \
+              --build-arg BUILDKIT_INLINE_CACHE \
+              --cache-from ${tagname} \
+              .
+
+            docker push ${tagname}:latest
+          done
+        env:
+          BUILDKIT_INLINE_CACHE: 1
+          DOCKER_BUILDKIT: 1
