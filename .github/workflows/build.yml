@@ -2,9 +2,9 @@ name: build-images
 run-name: build Docker images
 on:
   push:
-    # branches: [main]
-    # paths:
-    #   - lang/**
+    branches: [main]
+    paths:
+      - lang/**
 jobs:
   build:
     name: build images
