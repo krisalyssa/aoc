@@ -30,8 +30,8 @@ jobs:
               -f ${filename} \
               -t ${tagname} \
               --build-arg BUILDKIT_INLINE_CACHE \
-              --cache-from ${tagname} \
               .
+            # --cache-from ${tagname}
 
             docker push ${tagname}:latest
           done
