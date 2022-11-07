@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+docker build \
+  -f lang/lua/Dockerfile \
+  -t ghcr.io/craigcottingham/aoc/aoc-lua:latest \
+  .
