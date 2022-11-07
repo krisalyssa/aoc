@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+docker run \
+  -it \
+  --rm \
+  --name aoc-lua \
+  --mount type=bind,src=$(pwd),dst=/aoc \
+  --mount type=bind,src=$(pwd)/lang/lua/.luarocks,dst=/home/aoc/.luarocks \
+  ghcr.io/craigcottingham/aoc/aoc-lua:latest \
+  $@
