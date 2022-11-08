@@ -2,12 +2,20 @@ FROM erlang:25-alpine
 
 RUN apk add --update --no-cache \
   bash \
+  build-base \
   ca-certificates \
+  coreutils \
   curl \
   gcc \
   git \
   make \
   musl-dev \
+  openssl \
+  openssl-dev \
+  readline-dev \
+  tar \
+  unzip \
+  wget \
   && update-ca-certificates
 
 RUN git clone https://github.com/erlang/rebar3.git \
