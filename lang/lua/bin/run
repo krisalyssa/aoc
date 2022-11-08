@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
+YEAR=$1
+DAY=$2
+
 docker run \
-  -it \
+  --interactive \
+  --tty \
   --rm \
   --name aoc-lua \
   --mount type=bind,src=$(pwd),dst=/aoc \
   --mount type=bind,src=$(pwd)/lang/lua/.luarocks,dst=/home/aoc/.luarocks \
   ghcr.io/craigcottingham/aoc/aoc-lua:latest \
-  $@
+  years/${YEAR}/src/lua/${DAY}.lua
