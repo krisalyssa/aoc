@@ -4,7 +4,8 @@ YEAR=$1
 DAY=$2
 
 docker run \
-  -it \
+  --interactive \
+  --tty \
   --rm \
   --name aoc-lua \
   --mount type=bind,src=$(pwd),dst=/aoc \
