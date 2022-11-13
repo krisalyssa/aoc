@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-YEAR=$1
-DAY=$2
+FILENAME="$1.clje"
+if [[ ! -r "${FILENAME}" ]]; then
+  echo "${FILENAME}: file not found"
+fi
 
 docker run \
   --interactive \
@@ -10,4 +12,4 @@ docker run \
   --name aoc-clojerl \
   --mount type=bind,src=$(pwd),dst=/aoc \
   ghcr.io/craigcottingham/aoc/aoc-clojerl:latest \
-  years/${YEAR}/src/clojerl/${DAY}.clje
+  ${FILENAME}
