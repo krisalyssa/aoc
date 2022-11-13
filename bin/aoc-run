@@ -2,6 +2,7 @@
 
 usage() {
   echo "usage: aoc-run [-d day] [-y year] <language>"
+  echo "       aoc-run <language> <filename>"
   exit 1
 }
 
@@ -34,37 +35,43 @@ while getopts ":d:y:" opt; do
 done
 shift $(( OPTIND - 1 ))
 
-# strip leading zero, if any
-DAY=$(( DAY + 0 ))
-
-if (( YEAR < 2015 || YEAR > CURRENT_YEAR )); then
-  echo "year out of range"
-  usage
-fi
-
-if (( DAY < 1 || DAY > 25 )); then
-  echo "day out of range"
-  usage
-fi
-
-if (( YEAR == CURRENT_YEAR && DAY > CURRENT_DAY )); then
-  echo "day ${DAY} hasn't been released yet"
-  usage
-fi
-
 AOC_LANG=$1
+FILENAME=$2
 
-if [[ -d "lang/${AOC_LANG}" ]]; then
-  if [[ -x "lang/${AOC_LANG}/bin/run" ]]; then
-    shift
-    echo "running ${AOC_LANG} for ${YEAR} day ${DAY}"
-    echo ""
-    lang/${AOC_LANG}/bin/run ${YEAR} ${DAY}
-  else
-    echo "no run script for ${AOC_LANG}"
-    exit 1
-  fi
-else
+if [[ -z "${AOC_LANG}" ]]; then
+  usage
+elif [[ ! -d "lang/${AOC_LANG}" ]]; then
   echo "unknown language ${AOC_LANG}"
-  exit 1
+  usage
+elif [[ ! -x "lang/${AOC_LANG}/bin/run" ]]; then
+  echo "no run script for ${AOC_LANG}"
+  usage
 fi
+
+if [[ -n "${FILENAME}" ]]; then
+  FULL_FILENAME="lang/${AOC_LANG}/src/${FILENAME}"
+else
+  # strip leading zero, if any
+  DAY=$(( DAY + 0 ))
+
+  if (( YEAR < 2015 || YEAR > CURRENT_YEAR )); then
+    echo "year out of range"
+    usage
+  fi
+
+  if (( DAY < 1 || DAY > 25 )); then
+    echo "day out of range"
+    usage
+  fi
+
+  if (( YEAR == CURRENT_YEAR && DAY > CURRENT_DAY )); then
+    echo "day ${DAY} hasn't been released yet"
+    usage
+  fi
+
+  FULL_FILENAME="years/${YEAR}/src/${AOC_LANG}/${DAY}"
+fi
+
+echo "running ${FULL_FILENAME}"
+echo ""
+lang/${AOC_LANG}/bin/run "${FULL_FILENAME}"
