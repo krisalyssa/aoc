@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-FILENAME="$1.lua"
-if [[ ! -r "${FILENAME}" ]]; then
-  echo "${FILENAME}: file not found"
+FILENAME=""
+if [[ -n "$1" ]]; then
+  FILENAME="$1.lua"
+  if [[ ! -r "${FILENAME}" ]]; then
+    echo "${FILENAME}: file not found"
+  fi
 fi
 
 docker run \
