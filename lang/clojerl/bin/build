@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-docker build \
-  -f lang/clojerl/Dockerfile \
-  -t ghcr.io/craigcottingham/aoc/aoc-clojerl:latest \
-  .
