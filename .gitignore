@@ -2,6 +2,10 @@
 .token
 years/**/data/*.txt
 
+# master copies of devcontainer files are stored in lang/
+.devcontainer/devcontainer.json
+.devcontainer/Dockerfile
+
 # Clojerl (Clojure? Calva extension for VS Code?)
 .clj-kondo
 .lsp
