@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+usage() {
+  echo "usage: aoc <command> [params]"
+  exit 1
+}
+
+AOC_COMMAND=$1
+shift 1
+
+if [[ -z "${AOC_COMMAND}" ]]; then
+  usage
+else
+  SCRIPT_FILENAME="bin/aoc-${AOC_COMMAND}"
+  if [[ ! -x "${SCRIPT_FILENAME}" ]]; then
+    echo "unknown command '${AOC_COMMAND}'"
+    usage
+  fi
+
+  ${SCRIPT_FILENAME} $@
+fi
