@@ -19,7 +19,7 @@ if [[ -z "${AOC_LANG}" ]]; then
 elif [[ ! -d "lang/${AOC_LANG}" ]]; then
   echo "unknown language ${AOC_LANG}"
   usage
-# look in years/${YEAR}/${AOC_LANG}/bin for run script
+# look in years/${YEAR}/${AOC_LANG}/bin for script
 elif [[ ! -x "lang/${AOC_LANG}/run" ]]; then
   echo "no run script for ${AOC_LANG}"
   usage
