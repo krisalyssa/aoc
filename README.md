@@ -8,6 +8,11 @@
 
     aoc init
 
+### Temporary usage
+
+    lang/${LANG}/run ${YEAR} ${DAY}
+    lang/${LANG}/test ${YEAR}
+
 ## DESIGN PHILOSOPHY
 
 I like to use AoC each year to learn a new programming language. Unfortunately, this means installing
