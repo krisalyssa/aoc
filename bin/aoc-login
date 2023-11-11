@@ -1,0 +1,56 @@
+#!env bash
+
+select site in GitHub Google Reddit Twitter; do
+  case "${site}" in
+  GitHub)
+    URL="https://adventofcode.com/auth/github"
+    break
+    ;;
+
+  Google)
+    URL="https://adventofcode.com/auth/google"
+    break
+    ;;
+
+  Reddit)
+    URL="https://adventofcode.com/auth/reddit"
+    break
+    ;;
+
+  Twitter)
+    URL="https://adventofcode.com/auth/twitter"
+    break
+    ;;
+  esac
+done
+
+echo "Opening Safari so you can log in..."
+open -a Safari ${URL}
+
+cat <<EOT
+Once you have logged into your AoC account, using Safari,
+
+1. Select Develop > Show Web Inspector.
+2. Select the Storage tab.
+3. Select the All Storage sub tab, then Cookies.
+4. Double-click on the value for "session".
+5. Select the value and copy it to the clipboard with Ctrl-C.
+EOT
+
+read -rsp "Now that the session token value is on the clipboard, paste it here with Ctrl-V and press ENTER: " token
+echo
+
+# check that the value in token is valid, as best we can (only 0-9 and a-f, 128 characters?)
+token_length=$(echo -n "${token}" | wc -c)
+if [[ "${token_length}" == "128" ]]; then
+  if echo "${token}" | grep -E -v '[^0-9a-f]' >/dev/null; then
+    echo "${token}" >./.token
+    exit 0
+  else
+    echo "pasted value contains invalid characters"
+    exit 1
+  fi
+else
+  echo "pasted value is the wrong length (got ${token_length})"
+  exit 1
+fi
