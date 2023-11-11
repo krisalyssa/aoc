@@ -1,0 +1,16 @@
+#!/bin/bash
+
+usage() {
+  echo "usage: run YEAR DAY" 2>&1
+  exit 1
+}
+
+YEAR=$1
+[[ -z ${YEAR} ]] && usage
+
+DAY=$2
+[[ -z ${DAY} ]] && usage
+
+shift 2
+
+cd years/${YEAR}/elixir && lein run -m aoc-${YEAR}.day-${DAY}
