@@ -6,7 +6,7 @@ FORCE=
 # SESSION_TOKEN=
 VERBOSE=0
 
-[[ -z SESSION_TOKEN && -r ./.token ]] && SESSION_TOKEN=$(cat ./.token)
+[[ -z "${SESSION_TOKEN}" && -r ./.token ]] && SESSION_TOKEN=$(cat ./.token)
 
 data_filename() {
   local year=$1 day=$2
@@ -14,15 +14,21 @@ data_filename() {
   echo $(printf "years/%s/data/%02d.txt" "$year" "$day")
 }
 
+data_url() {
+  local year=$1 day=$2
+  local stripped_day=$((day + 0))
+  echo "https://adventofcode.com/${year}/day/${stripped_day}/input"
+}
+
 fetch() {
   local year=$1 day=$2
   local fn=$(data_filename $year $day)
   local outfile=$(mktemp)
   local status_code
-  local url="https://adventofcode.com/${year}/day/${day}/input"
+  local url=$(data_url $year $day)
 
   if [[ -n "${DRY_RUN}" ]]; then
-    echo "curl --request GET --cookie \"session=***\" --location --output \"${fn}\" --show-error --silent --write-out \"%{http_code}\" --url \"https://adventofcode.com/${year}/day/${day}/input\""
+    echo "curl --request GET --cookie \"session=***\" --location --output \"${fn}\" --show-error --silent --write-out \"%{http_code}\" --url \"${url}\""
   else
     status_code=$(
       curl \
@@ -33,7 +39,7 @@ fetch() {
         --show-error \
         --silent \
         --write-out "%{http_code}" \
-        --url "https://adventofcode.com/${year}/day/${day}/input"
+        --url "${url}"
     )
 
     case "${status_code}" in
