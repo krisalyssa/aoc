@@ -1,0 +1,13 @@
+#!/bin/bash
+
+usage() {
+  echo "usage: test YEAR" 2>&1
+  exit 1
+}
+
+YEAR=$1
+[[ -z ${YEAR} ]] && usage
+
+shift 1
+
+cd years/${YEAR}/rust && cargo test
