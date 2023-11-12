@@ -13,4 +13,4 @@ DAY=$2
 
 shift 2
 
-cd years/${YEAR}/elixir && lein run -m aoc-${YEAR}.day-${DAY}
+cd years/${YEAR}/elixir && mix run -e "AoC.Day${DAY}.run"
