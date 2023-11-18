@@ -9,3 +9,4 @@ years/**/data/*.txt
 # Clojerl (Clojure? Calva extension for VS Code?)
 .clj-kondo
 .lsp
+/.vscode
