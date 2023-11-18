@@ -13,4 +13,4 @@ DAY=$2
 
 shift 2
 
-cd years/${YEAR}/swift && swift run AoC ${DAY}
+cd years/${YEAR}/swift && swift run advent ${DAY}
