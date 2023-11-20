@@ -29,9 +29,3 @@ $ swift run advent
 Build complete! (6.85s)
 Hello, world!
 ```
-
-Set up XCTest.
-
-```shell
-swift test generate-linuxmain
-```
