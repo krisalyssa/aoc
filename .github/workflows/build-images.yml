@@ -18,6 +18,12 @@ jobs:
       - name: check out code
         uses: actions/checkout@v4
 
+      # - name: get changed files
+      #   id: files
+      #   uses: tj-actions/changed-files@v45
+      #   with:
+      #     since_last_remote_commit: true
+
       - name: set variables
         id: vars
         shell: bash
@@ -39,6 +45,30 @@ jobs:
       - name: check out most recent commit
         uses: actions/checkout@v4
 
+      - name: set variables
+        id: vars
+        shell: bash
+        run: |
+          cd lang/${{ matrix.lang }}
+
+          image="ghcr.io/${{ github.repository }}/aoc-${{ matrix.lang }}"
+          echo "image=${image}" >> "${GITHUB_OUTPUT}"
+
+          release="false"
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]] ; then
+             release="true"
+          fi
+          echo "release=${release}" >> "${GITHUB_OUTPUT}"
+
+          echo "short_sha=$( git rev-parse --short HEAD )" >> "${GITHUB_OUTPUT}"
+
+          version=$( grep "LABEL version=" Dockerfile | sed -e 's/LABEL version="\(.*\)"/\1/' -e 's/ //g' )
+          if [[ -z "${version// }" ]]; then
+             echo - Failed to get version. Be sure you have a label named "version" in your Dockerfile.
+             exit 1
+          fi
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
       - name: set up docker buildx
         uses: docker/setup-buildx-action@v3
 
@@ -49,13 +79,61 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: build image
+      - if: steps.vars.outputs.release == 'false'
+        name: build image for testing
         uses: docker/build-push-action@v6
         with:
           # but see https://docs.docker.com/build/ci/github-actions/cache/#cache-backend-api
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ matrix.lang }}
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:${{ matrix.lang }},mode=max
+          cache-from: type=registry,ref=${{ steps.vars.outputs.image }}
+          cache-to: type=registry,ref=${{ steps.vars.outputs.image }},mode=max
           #
           context: lang/${{ matrix.lang }}
-          push: ${{ github.event_name == 'push' }}
-          tags: ghcr.io/${{ github.repository }}/aoc:${{ matrix.lang }}
+          push: true
+          tags: |
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.short_sha }}
+
+      - if: steps.vars.outputs.release == 'true'
+        name: build image for release
+        uses: docker/build-push-action@v6
+        with:
+          # but see https://docs.docker.com/build/ci/github-actions/cache/#cache-backend-api
+          cache-from: type=registry,ref=${{ steps.vars.outputs.image }}
+          cache-to: type=registry,ref=${{ steps.vars.outputs.image }},mode=max
+          #
+          context: lang/${{ matrix.lang }}
+          push: true
+          tags: |
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}
+            ${{ steps.vars.outputs.image }}:latest
+
+      - if: steps.vars.outputs.release == 'true'
+        name: create release
+        uses: ncipollo/release-action@v1
+        with:
+          # allowUpdates:
+          # artifactErrorsFailBuild:
+          # artifacts:
+          # artifactContentType:
+          # bodyFile:
+          # commit:
+          # discussionCategory:
+          draft: false
+          # generateReleaseNotes:
+          # makeLatest:
+          name: ${{ steps.vars.outputs.version }}
+          # omitBody:
+          # omitBodyDuringUpdate:
+          # omitDraftDuringUpdate:
+          # omitName:
+          # omitNameDuringUpdate:
+          # omitPrereleaseDuringUpdate:
+          # owner:
+          prerelease: false
+          # removeArtifacts:
+          # replacesArtifacts:
+          # repo:
+          # skipIfReleaseExists:
+          tag: ${{ steps.vars.outputs.version }}
+          # token:
+          # updateOnlyUnreleased:
+          body: "[${{ steps.vars.outputs.version }}](url) (`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`)"
