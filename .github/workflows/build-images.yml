@@ -1,0 +1,61 @@
+name: build-images
+run-name: build docker images
+on:
+  pull_request:
+    paths:
+      - lang/**/Dockerfile
+  push:
+    branches: [main]
+    paths:
+      - lang/**/Dockerfile
+jobs:
+  setup:
+    name: set up context
+    runs-on: ubuntu-latest
+    outputs:
+      langs: ${{ steps.vars.outputs.langs }}
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+
+      - name: set variables
+        id: vars
+        shell: bash
+        run: |
+          langs=()
+          for filename in $( find lang -type f -name 'Dockerfile' ); do
+            langs+=("$( basename $( dirname ${filename} ) )")
+          done
+          echo "langs=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${langs[@]}" )" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: build images
+    needs: [setup]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lang: ${{ fromJSON(needs.setup.outputs.langs) }}
+    steps:
+      - name: check out most recent commit
+        uses: actions/checkout@v4
+
+      - name: set up docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: log in to container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build image
+        uses: docker/build-push-action@v6
+        with:
+          # but see https://docs.docker.com/build/ci/github-actions/cache/#cache-backend-api
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ matrix.lang }}
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:${{ matrix.lang }},mode=max
+          #
+          context: lang/${{ matrix.lang }}
+          push: ${{ github.event_name == 'push' }}
+          tags: ghcr.io/${{ github.repository }}/aoc:${{ matrix.lang }}
