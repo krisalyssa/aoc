@@ -1,6 +1,7 @@
 FROM rust:1.82-alpine3.20 AS base
 
 LABEL lang="rust"
+LABEL version="1.82-1"
 
 ENV DOCKER_APP_ROOT=/aoc
 WORKDIR $DOCKER_APP_ROOT
