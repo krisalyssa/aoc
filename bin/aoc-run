@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+## run a solution
 
 usage() {
   echo "usage: aoc-run <language> <year> <day>"

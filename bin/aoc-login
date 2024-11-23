@@ -1,4 +1,6 @@
-#!env bash
+#!/bin/bash
+
+## log in to adventofcode.com to get a session token
 
 select site in GitHub Google Reddit Twitter; do
   case "${site}" in
