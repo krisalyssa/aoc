@@ -1,0 +1,39 @@
+#!/bin/bash
+
+## start a container for a language
+
+usage() {
+  echo "usage: aoc-start <language> <year>"
+  exit 1
+}
+
+# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
+
+AOC_LANG=$1
+AOC_YEAR=$2
+
+if [[ -z "${AOC_LANG}" ]]; then
+  usage
+elif [[ ! -d "lang/${AOC_LANG}" ]]; then
+  echo "unknown language ${AOC_LANG}"
+  usage
+# look in years/${YEAR}/${AOC_LANG}/bin for script
+elif [[ -x "lang/${AOC_LANG}/start" ]]; then
+  shift
+  lang/${AOC_LANG}/start $@
+elif [[ -z "${AOC_YEAR}" ]]; then
+  usage
+elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
+  echo "year out of range"
+  usage
+else
+  docker run \
+    --interactive \
+    --mount type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src \
+    --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
+    --name aoc-${AOC_LANG} \
+    --rm \
+    --tty \
+    krisalyssa/aoc:${AOC_LANG}
+fi
