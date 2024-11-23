@@ -1,4 +1,6 @@
-#!env bash
+#!/bin/bash
+
+## pull data
 
 CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
 DRY_RUN=

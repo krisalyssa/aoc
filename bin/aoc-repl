@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+## start a REPL
 
 usage() {
   echo "usage: aoc-repl <language>"
