@@ -10,11 +10,15 @@ on:
       - lang/**/Dockerfile
   workflow_dispatch:
     inputs:
+      languages:
+        description: A comma- or space-separated list of languages to build. If omitted, build all languages.
+        required: false
+        type: string
       release:
         description: If checked, create a release.
         required: false
-        default: false
         type: boolean
+        default: false
 jobs:
   setup:
     name: set up context
@@ -36,9 +40,19 @@ jobs:
         shell: bash
         run: |
           langs=()
-          for filename in $( find lang -type f -name 'Dockerfile' ); do
-            langs+=("$( basename $( dirname ${filename} ) )")
-          done
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.languages }}" ]]; then
+            languages=$( echo "${{ github.event.inputs.languages }}" | sed -e 's/,/ /g' )
+            for lang in $( echo ${languages} ); do
+              langs+=${lang}
+            done
+          else
+            langs=()
+            for filename in $( find lang -type f -name 'Dockerfile' ); do
+              langs+=("$( basename $( dirname ${filename} ) )")
+            done
+          fi
+
           echo "langs=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${langs[@]}" )" >> "$GITHUB_OUTPUT"
 
   build:
