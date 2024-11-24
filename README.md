@@ -6,11 +6,25 @@
 
 ## USAGE
 
+    aoc build elixir
     aoc get
     aoc run elixir
     aoc start elixir
 
 ## SUBCOMMANDS
+
+### build
+
+Builds an image for a language for local testing.
+
+There are two equivalent forms of the subcommand:
+
+```shell
+aoc build -l <language> [ -t <tag> ]
+aoc build [ -t <tag> ] <language>
+```
+
+- If `-t` is not given, `<tag>` defaults to `local`.
 
 ### get
 
