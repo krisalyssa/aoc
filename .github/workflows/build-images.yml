@@ -73,6 +73,15 @@ jobs:
           fi
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
 
+      - name: log variables
+        shell: bash
+        run: |
+          echo "name:      ${{ steps.vars.outputs.name }}"
+          echo "image:     ${{ steps.vars.outputs.image }}"
+          echo "release:   ${{ steps.vars.outputs.release }}"
+          echo "short-sha: ${{ steps.vars.outputs.short-sha }}"
+          echo "version:   ${{ steps.vars.outputs.version }}"
+
       - name: set up docker buildx
         uses: docker/setup-buildx-action@v3
 
