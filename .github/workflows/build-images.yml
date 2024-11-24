@@ -110,18 +110,18 @@ jobs:
             ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}
             ${{ steps.vars.outputs.image }}:latest
 
-      - if: steps.vars.outputs.release == 'true'
-        name: create release
+      - name: create release
         uses: ncipollo/release-action@v1
         with:
-          # allowUpdates:
+          allowUpdates: true
           # artifactErrorsFailBuild:
           # artifacts:
           # artifactContentType:
+          body: "`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`"
           # bodyFile:
           # commit:
           # discussionCategory:
-          draft: false
+          draft: ${{ steps.vars.outputs.release == 'true' }}
           # generateReleaseNotes:
           # makeLatest:
           name: ${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}
@@ -136,8 +136,7 @@ jobs:
           # removeArtifacts:
           # replacesArtifacts:
           # repo:
-          # skipIfReleaseExists:
+          skipIfReleaseExists: true
           tag: ${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}
           # token:
-          # updateOnlyUnreleased:
-          body: "`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`"
+          updateOnlyUnreleased: true
