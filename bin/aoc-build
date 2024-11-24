@@ -54,7 +54,9 @@ shift $((OPTIND -1))
 AOC_LANG=${AOC_LANG:-$1}
 AOC_TAG=${AOC_TAG:-local}
 
-if [[ -d "lang/${AOC_LANG}" ]]; then
+if [[ -z "${AOC_LANG}" ]]; then
+  usage
+elif [[ -d "lang/${AOC_LANG}" ]]; then
   if [[ -x "lang/${AOC_LANG}/build" ]]; then
     shift
     lang/${AOC_LANG}/build $@
@@ -65,6 +67,6 @@ if [[ -d "lang/${AOC_LANG}" ]]; then
     docker build -t ghcr.io/krisalyssa/aoc-${AOC_LANG}:${AOC_TAG} -f lang/${AOC_LANG}/Dockerfile lang/${AOC_LANG}
   fi
 else
-  echo "unknown language ${AOC_LANG}"
+  echo "unknown language '${AOC_LANG}'"
   exit 1
 fi
