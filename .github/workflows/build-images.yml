@@ -9,6 +9,12 @@ on:
     paths:
       - lang/**/Dockerfile
   workflow_dispatch:
+    inputs:
+      release:
+        description: If checked, create a release.
+        required: false
+        default: false
+        type: boolean
 jobs:
   setup:
     name: set up context
@@ -60,7 +66,8 @@ jobs:
           echo "image=ghcr.io/${{ github.repository }}/${name}" >> "${GITHUB_OUTPUT}"
 
           release="false"
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]] ; then
+          if [[ ( "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ) ||
+                ( "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.release }}" == "true" ) ]] ; then
              release="true"
           fi
           echo "release=${release}" >> "${GITHUB_OUTPUT}"
