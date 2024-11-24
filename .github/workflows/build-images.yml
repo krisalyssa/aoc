@@ -121,7 +121,7 @@ jobs:
           cache-to: type=registry,ref=${{ steps.vars.outputs.image }},mode=max
           #
           context: lang/${{ matrix.lang }}
-          platforms:
+          platforms: |
             linux/amd64
             linux/arm64
           push: true
@@ -137,7 +137,7 @@ jobs:
           cache-to: type=registry,ref=${{ steps.vars.outputs.image }},mode=max
           #
           context: lang/${{ matrix.lang }}
-          platforms:
+          platforms: |
             linux/amd64
             linux/arm64
           push: true
