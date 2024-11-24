@@ -138,7 +138,7 @@ jobs:
           # bodyFile:
           # commit:
           # discussionCategory:
-          draft: ${{ steps.vars.outputs.release == 'true' }}
+          draft: ${{ steps.vars.outputs.release != 'true' }}
           # generateReleaseNotes:
           # makeLatest:
           name: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
@@ -154,6 +154,6 @@ jobs:
           # replacesArtifacts:
           # repo:
           skipIfReleaseExists: true
-          tag: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
+          tag: "${{ steps.vars.outputs.name }}-${{ steps.vars.outputs.version }}"
           # token:
           updateOnlyUnreleased: true
