@@ -6,9 +6,50 @@
 
 ## USAGE
 
-    aoc init
+    aoc run elixir
+    aoc start elixir
 
-### Temporary usage
+## SUBCOMMANDS
+
+### run
+
+Runs code for a year, day, and language.
+
+- A Docker container for the language (and tag if `-t` is given) is started.
+- The data directory for the year is mounted at `/aoc/data` in the container.
+- The language's source directory is mounted at `/aoc/src` in the container.
+- The language's `run` script is executed and passed the day on the command line.
+
+There are two equivalent forms of the subcommand:
+
+```shell
+aoc run -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]
+aoc run [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>
+```
+
+- If `-y` is not given, `<year>` defaults to the current year.
+- If `-d` is not given, `<day>` defaults to the current day.
+- If `-t` is not given, `<tag>` defaults to `latest`.
+
+### start
+
+Starts a Docker container for the language, with data files mounted.
+
+- A Docker container for the language (and tag if `-t` is given) is started.
+- The data directory for the year is mounted at `/aoc/data` in the container.
+- The language's source directory is mounted at `/aoc/src` in the container.
+
+There are two equivalent forms of the subcommand:
+
+```shell
+aoc start -l <language> [ -y <year> ] [ -t <tag> ]
+aoc start [ -y <year> ] [ -t <tag> ] <language>
+```
+
+- If `-y` is not given, `<year>` defaults to the current year.
+- If `-t` is not given, `<tag>` defaults to `latest`.
+
+## TEMPORARY USAGE
 
     lang/${LANG}/run ${YEAR} ${DAY}
     lang/${LANG}/test ${YEAR}
