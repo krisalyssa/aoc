@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - lang/**/Dockerfile
+  workflow_dispatch:
 jobs:
   setup:
     name: set up context
@@ -133,7 +134,7 @@ jobs:
           draft: ${{ steps.vars.outputs.release == 'true' }}
           # generateReleaseNotes:
           # makeLatest:
-          name: ${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}
+          name: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
           # omitBody:
           # omitBodyDuringUpdate:
           # omitDraftDuringUpdate:
@@ -146,6 +147,6 @@ jobs:
           # replacesArtifacts:
           # repo:
           skipIfReleaseExists: true
-          tag: ${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}
+          tag: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
           # token:
           updateOnlyUnreleased: true
