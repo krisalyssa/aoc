@@ -6,10 +6,29 @@
 
 ## USAGE
 
+    aoc get
     aoc run elixir
     aoc start elixir
 
 ## SUBCOMMANDS
+
+### get
+
+Gets puzzle data from adventofcode.com.
+
+```shell
+aoc get [-f] [-n] [-q] [-v] [year [day]]
+```
+
+If day is omitted, get data for all days for the year.
+If year is omitted, get data for all years since and including 2015.
+
+Options:
+* -f -- force download of data even if the file exists locally
+* -h -- show help
+* -n -- show what will be executed, but don't actually execute it
+* -q -- decrease verbosity of output
+* -v -- increase verbosity of output
 
 ### run
 

@@ -2,7 +2,8 @@
 
 ## pull data
 
-CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
 DRY_RUN=
 FORCE=
 # SESSION_TOKEN=
@@ -117,19 +118,22 @@ maybe_fetch() {
 }
 
 usage() {
-  echo "Usage: aoc-get [-f] [-n] [-q] [-v] [year [day]]"
+  local exitcode=${1:-1}
+
+  echo "usage: aoc-get [-f] [-n] [-q] [-v] [year [day]]"
   echo "       aoc-get -h"
   echo ""
-  echo "If day is omitted, will get data for all days for the year."
-  echo "If year is omitted, will get data for all years since and including 2015."
+  echo "If day is omitted, get data for all days for the year."
+  echo "If year is omitted, get data for all years since and including 2015."
   echo ""
   echo "Options:"
-  echo "  -f   force download of data even if the file exists locally"
-  echo "  -h   show this help"
-  echo "  -n   show what will be executed, but don't actually execute it"
-  echo "  -q   decrease verbosity of output"
-  echo "  -v   increase verbosity of output"
-  exit 1
+  echo "* -f -- force download of data even if the file exists locally"
+  echo "* -h -- show this help"
+  echo "* -n -- show what will be executed, but don't actually execute it"
+  echo "* -q -- decrease verbosity of output"
+  echo "* -v -- increase verbosity of output"
+
+  exit $exitcode
 }
 
 verbose() {
