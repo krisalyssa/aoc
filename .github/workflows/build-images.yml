@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - lang/**/Dockerfile
+  workflow_dispatch:
 jobs:
   setup:
     name: set up context
@@ -53,8 +54,10 @@ jobs:
         run: |
           cd lang/${{ matrix.lang }}
 
-          image="ghcr.io/${{ github.repository }}/aoc-${{ matrix.lang }}"
-          echo "image=${image}" >> "${GITHUB_OUTPUT}"
+          name="aoc-${{ matrix.lang }}"
+          echo "name=${name}" >> "${GITHUB_OUTPUT}"
+
+          echo "image=ghcr.io/${{ github.repository }}/${name}" >> "${GITHUB_OUTPUT}"
 
           release="false"
           if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]] ; then
@@ -62,7 +65,7 @@ jobs:
           fi
           echo "release=${release}" >> "${GITHUB_OUTPUT}"
 
-          echo "short_sha=$( git rev-parse --short HEAD )" >> "${GITHUB_OUTPUT}"
+          echo "short-sha=$( git rev-parse --short HEAD )" >> "${GITHUB_OUTPUT}"
 
           version=$( grep "LABEL version=" Dockerfile | sed -e 's/LABEL version="\(.*\)"/\1/' -e 's/ //g' )
           if [[ -z "${version// }" ]]; then
@@ -70,6 +73,15 @@ jobs:
              exit 1
           fi
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: log variables
+        shell: bash
+        run: |
+          echo "name:      ${{ steps.vars.outputs.name }}"
+          echo "image:     ${{ steps.vars.outputs.image }}"
+          echo "release:   ${{ steps.vars.outputs.release }}"
+          echo "short-sha: ${{ steps.vars.outputs.short-sha }}"
+          echo "version:   ${{ steps.vars.outputs.version }}"
 
       - name: set up docker buildx
         uses: docker/setup-buildx-action@v3
@@ -92,7 +104,7 @@ jobs:
           context: lang/${{ matrix.lang }}
           push: true
           tags: |
-            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.short_sha }}
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.short-sha }}
 
       - if: steps.vars.outputs.release == 'true'
         name: build image for release
@@ -108,21 +120,21 @@ jobs:
             ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}
             ${{ steps.vars.outputs.image }}:latest
 
-      - if: steps.vars.outputs.release == 'true'
-        name: create release
+      - name: create release
         uses: ncipollo/release-action@v1
         with:
-          # allowUpdates:
+          allowUpdates: true
           # artifactErrorsFailBuild:
           # artifacts:
           # artifactContentType:
+          body: "`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`"
           # bodyFile:
           # commit:
           # discussionCategory:
-          draft: false
+          draft: ${{ steps.vars.outputs.release == 'true' }}
           # generateReleaseNotes:
           # makeLatest:
-          name: ${{ steps.vars.outputs.version }}
+          name: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
           # omitBody:
           # omitBodyDuringUpdate:
           # omitDraftDuringUpdate:
@@ -134,8 +146,7 @@ jobs:
           # removeArtifacts:
           # replacesArtifacts:
           # repo:
-          # skipIfReleaseExists:
-          tag: ${{ steps.vars.outputs.version }}
+          skipIfReleaseExists: true
+          tag: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
           # token:
-          # updateOnlyUnreleased:
-          body: "[${{ steps.vars.outputs.version }}](url) (`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`)"
+          updateOnlyUnreleased: true
