@@ -48,8 +48,6 @@ jobs:
     strategy:
       matrix:
         lang: ${{ fromJSON(needs.setup.outputs.langs) }}
-        exclude:
-          - lang: clojure
     steps:
       - name: check out most recent commit
         uses: actions/checkout@v4
