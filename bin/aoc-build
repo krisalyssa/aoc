@@ -64,7 +64,7 @@ elif [[ -d "lang/${AOC_LANG}" ]]; then
     echo "no Dockerfile for language ${AOC_LANG}"
     exit 1
   else
-    docker build -t ghcr.io/krisalyssa/aoc-${AOC_LANG}:${AOC_TAG} -f lang/${AOC_LANG}/Dockerfile lang/${AOC_LANG}
+    docker build -t ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG} -f lang/${AOC_LANG}/Dockerfile lang/${AOC_LANG}
   fi
 else
   echo "unknown language '${AOC_LANG}'"
