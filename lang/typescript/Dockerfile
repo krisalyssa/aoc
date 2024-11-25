@@ -2,6 +2,8 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:1.1.6-22-bullseye AS base
 
 LABEL lang="typescript"
 LABEL version="1.1.6-1"
+LABEL org.opencontainers.image.source="https://github.com/krisalyssa/aoc"
+LABEL org.opencontainers.image.description="Typescript image for AoC"
 
 ENV DOCKER_APP_ROOT=/aoc
 WORKDIR $DOCKER_APP_ROOT
