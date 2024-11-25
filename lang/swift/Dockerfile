@@ -9,6 +9,9 @@ ENV DOCKER_APP_ROOT=/aoc
 WORKDIR $DOCKER_APP_ROOT
 
 RUN \
+  apt-get update -y && \
+  apt-get dist-upgrade -y && \
+  apt-get clean -y && \
   adduser --home /home/aoc --shell /bin/bash aoc && \
   chown aoc:aoc $DOCKER_APP_ROOT
 
