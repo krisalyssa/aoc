@@ -71,13 +71,16 @@ elif [[ ! -d "lang/${AOC_LANG}" ]]; then
 # look in years/${YEAR}/${AOC_LANG}/bin for script
 elif [[ -x "lang/${AOC_LANG}/start" ]]; then
   shift
-  lang/${AOC_LANG}/start $@
+  lang/${AOC_LANG}/start -y ${AOC_YEAR} -t ${AOC_TAG}
 elif [[ -z "${AOC_YEAR}" ]]; then
   usage
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
   echo "year out of range"
   usage
 fi
+
+## TODO: get additional options like --platform from a config file in lang/${AOC_LANG}
+##       so we don't need a lang-specific start script just for that
 
 docker run \
   --interactive \
@@ -86,4 +89,4 @@ docker run \
   --name aoc-${AOC_LANG} \
   --rm \
   --tty \
-  ghcr.io/krisalyssa/aoc-${AOC_LANG}:${AOC_TAG}
+  ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}
