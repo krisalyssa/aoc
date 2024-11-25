@@ -55,6 +55,11 @@ jobs:
 
           echo "langs=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${langs[@]}" )" >> "$GITHUB_OUTPUT"
 
+      - name: log variables
+        shell: bash
+        run: |
+          echo "langs=${{ steps.vars.outputs.langs }}"
+
   build:
     name: build images
     needs: [setup]
@@ -63,7 +68,7 @@ jobs:
       matrix:
         lang: ${{ fromJSON(needs.setup.outputs.langs) }}
     steps:
-      - name: check out most recent commit
+      - name: check out code
         uses: actions/checkout@v4
 
       - name: set variables
@@ -101,6 +106,9 @@ jobs:
           echo "release:   ${{ steps.vars.outputs.release }}"
           echo "short-sha: ${{ steps.vars.outputs.short-sha }}"
           echo "version:   ${{ steps.vars.outputs.version }}"
+
+      - name: set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: set up docker buildx
         uses: docker/setup-buildx-action@v3
