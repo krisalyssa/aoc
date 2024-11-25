@@ -2,6 +2,8 @@ FROM swift:6.0.2-noble AS base
 
 LABEL lang="swift"
 LABEL version="6.0.2-1"
+LABEL org.opencontainers.image.source="https://github.com/krisalyssa/aoc"
+LABEL org.opencontainers.image.description="Swift image for AoC"
 
 ENV DOCKER_APP_ROOT=/aoc
 WORKDIR $DOCKER_APP_ROOT
