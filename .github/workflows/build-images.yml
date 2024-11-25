@@ -44,15 +44,13 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.languages }}" ]]; then
             languages=$( echo "${{ github.event.inputs.languages }}" | sed -e 's/,/ /g' )
             for lang in $( echo ${languages} ); do
-              langs+=${lang}
+              langs+=(${lang})
             done
           else
-            langs=()
             for filename in $( find lang -type f -name 'Dockerfile' ); do
               langs+=("$( basename $( dirname ${filename} ) )")
             done
           fi
-
           echo "langs=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${langs[@]}" )" >> "$GITHUB_OUTPUT"
 
       - name: log variables
@@ -80,16 +78,11 @@ jobs:
           name="aoc-${{ matrix.lang }}"
           echo "name=${name}" >> "${GITHUB_OUTPUT}"
 
-          echo "image=ghcr.io/${{ github.repository }}/${name}" >> "${GITHUB_OUTPUT}"
+          image="ghcr.io/${{ github.repository }}/${name}"
+          echo "image=${image}" >> "${GITHUB_OUTPUT}"
 
-          release="false"
-          if [[ ( "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ) ||
-                ( "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.release }}" == "true" ) ]] ; then
-             release="true"
-          fi
-          echo "release=${release}" >> "${GITHUB_OUTPUT}"
-
-          echo "short-sha=$( git rev-parse --short HEAD )" >> "${GITHUB_OUTPUT}"
+          short_sha="$( git rev-parse --short HEAD )"
+          echo "short-sha=${short_sha}" >> "${GITHUB_OUTPUT}"
 
           version=$( grep "LABEL version=" Dockerfile | sed -e 's/LABEL version="\(.*\)"/\1/' -e 's/ //g' )
           if [[ -z "${version// }" ]]; then
@@ -98,20 +91,45 @@ jobs:
           fi
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
 
+          tags=()
+          if [[ ( "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ) ||
+                ( "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.release }}" == "true" ) ]] ; then
+            release="true"
+            tags+=("${image}:${version}")
+            tags+=("${image}:latest")
+          else
+            release="false"
+            tags+=("${image}:${short_sha}")
+          fi
+          echo "release=${release}" >> "${GITHUB_OUTPUT}"
+          echo "tags=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${tags[@]}" )" >> "$GITHUB_OUTPUT"
+
       - name: log variables
         shell: bash
         run: |
-          echo "name:      ${{ steps.vars.outputs.name }}"
-          echo "image:     ${{ steps.vars.outputs.image }}"
-          echo "release:   ${{ steps.vars.outputs.release }}"
-          echo "short-sha: ${{ steps.vars.outputs.short-sha }}"
-          echo "version:   ${{ steps.vars.outputs.version }}"
+          echo "github.event_name: ${{ github.event_name }}"
+          echo "github.ref:        ${{ github.ref }}"
+          echo ""
+          echo "name:              ${{ steps.vars.outputs.name }}"
+          echo "image:             ${{ steps.vars.outputs.image }}"
+          echo "release:           ${{ steps.vars.outputs.release }}"
+          echo "short-sha:         ${{ steps.vars.outputs.short-sha }}"
+          echo "tags:              ${{ steps.vars.outputs.tags }}"
+          echo "version:           ${{ steps.vars.outputs.version }}"
 
       - name: set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: set up docker buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: cache docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
       - name: log in to container registry
         uses: docker/login-action@v3
@@ -124,34 +142,25 @@ jobs:
         name: build image for testing
         uses: docker/build-push-action@v6
         with:
-          # but see https://docs.docker.com/build/ci/github-actions/cache/#cache-backend-api
-          cache-from: type=registry,ref=${{ steps.vars.outputs.image }}
-          cache-to: type=registry,ref=${{ steps.vars.outputs.image }},mode=max
-          #
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           context: lang/${{ matrix.lang }}
           platforms: |
             linux/amd64
-            linux/arm64
           push: true
-          tags: |
-            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.short-sha }}
+          tags: ${{ join(fromJSON(steps.vars.outputs.tags), ',') }}
 
       - if: steps.vars.outputs.release == 'true'
         name: build image for release
         uses: docker/build-push-action@v6
         with:
-          # but see https://docs.docker.com/build/ci/github-actions/cache/#cache-backend-api
-          cache-from: type=registry,ref=${{ steps.vars.outputs.image }}
-          cache-to: type=registry,ref=${{ steps.vars.outputs.image }},mode=max
-          #
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           context: lang/${{ matrix.lang }}
           platforms: |
             linux/amd64
-            linux/arm64
           push: true
-          tags: |
-            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}
-            ${{ steps.vars.outputs.image }}:latest
+          tags: ${{ join(fromJSON(steps.vars.outputs.tags), ',') }}
 
       - name: create release
         uses: ncipollo/release-action@v1
@@ -183,3 +192,10 @@ jobs:
           tag: "${{ steps.vars.outputs.name }}-${{ steps.vars.outputs.version }}"
           # token:
           updateOnlyUnreleased: true
+
+      # https://github.com/docker/build-push-action/issues/252
+      # https://github.com/moby/buildkit/issues/1896
+      - name: replace cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
