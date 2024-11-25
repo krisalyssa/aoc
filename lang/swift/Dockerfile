@@ -1,4 +1,4 @@
-FROM swift:6.0.2-noble AS base
+FROM swift:6.0.2-noble-slim AS base
 
 LABEL lang="swift"
 LABEL version="6.0.2-1"
