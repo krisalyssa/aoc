@@ -147,6 +147,7 @@ jobs:
           context: lang/${{ matrix.lang }}
           platforms: |
             linux/amd64
+            linux/arm64
           push: true
           tags: ${{ join(fromJSON(steps.vars.outputs.tags), ',') }}
 
@@ -159,6 +160,7 @@ jobs:
           context: lang/${{ matrix.lang }}
           platforms: |
             linux/amd64
+            linux/arm64
           push: true
           tags: ${{ join(fromJSON(steps.vars.outputs.tags), ',') }}
 
