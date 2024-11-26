@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "*** in lang/swift/aoc-start"
-
 ## start a container for a language
 
 usage() {
