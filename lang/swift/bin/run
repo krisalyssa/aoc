@@ -1,0 +1,13 @@
+#!/bin/bash
+
+usage() {
+  echo "usage: run DAY" 2>&1
+  exit 1
+}
+
+DAY=$1
+[[ -z ${DAY} ]] && usage
+
+shift 1
+
+cd /aoc/src && swift run advent ${DAY}
