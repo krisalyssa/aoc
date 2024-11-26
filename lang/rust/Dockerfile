@@ -1,7 +1,7 @@
 FROM rust:1.82-alpine3.20 AS base
 
 LABEL lang="rust"
-LABEL version="1.82-1"
+LABEL version="1.82-2"
 LABEL org.opencontainers.image.source="https://github.com/krisalyssa/aoc"
 LABEL org.opencontainers.image.description="Rust image for AoC"
 
