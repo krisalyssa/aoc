@@ -76,10 +76,8 @@ if [[ -z "${AOC_LANG}" ]]; then
 elif [[ ! -d "lang/${AOC_LANG}" ]]; then
   echo "unknown language ${AOC_LANG}"
   usage
-# look in years/${YEAR}/${AOC_LANG}/bin for script
-elif [[ ! -x "lang/${AOC_LANG}/run" ]]; then
-  echo "no run script for ${AOC_LANG}"
-  usage
+elif [[ -x "lang/${AOC_LANG}/aoc-run" ]]; then
+  lang/${AOC_LANG}/aoc-run -y ${AOC_YEAR} -t ${AOC_TAG}
 elif [[ -z "${AOC_YEAR}" ]]; then
   usage
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
@@ -101,14 +99,17 @@ else
 
   # now that we're done comparing numbers, force day to two digits
   AOC_DAY=$(printf "%02d" ${AOC_DAY})
-fi
 
-docker run \
-  --interactive \
-  --mount type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src \
-  --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-  --name aoc-${AOC_LANG} \
-  --rm \
-  --tty \
-  ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG} \
-  -c "bin/run ${AOC_DAY}"
+  ## TODO: get additional options like --platform from a config file in lang/${AOC_LANG}
+  ##       so we don't need a lang-specific script just for that
+
+  docker run \
+    --interactive \
+    --mount type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src \
+    --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
+    --name aoc-${AOC_LANG} \
+    --rm \
+    --tty \
+    ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG} \
+    -c "bin/run ${AOC_DAY}"
+fi
