@@ -59,14 +59,14 @@ if [[ -z "${AOC_YEAR}" ]]; then
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
   echo "year out of range"
   usage
-else
-  docker run \
-    --interactive \
-    --mount type=bind,src=./years/${AOC_YEAR}/typescript,dst=/aoc/src \
-    --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-    --mount type=volume,src=typescript-${AOC_YEAR}--build,dst=/aoc/src/.build \
-    --name aoc-typescript \
-    --rm \
-    --tty \
-    ghcr.io/krisalyssa/aoc/aoc-typescript:${AOC_TAG}
 fi
+
+docker run \
+  --interactive \
+  --mount type=bind,src=./years/${AOC_YEAR}/typescript,dst=/aoc/src \
+  --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
+  --mount type=volume,src=typescript-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
+  --name aoc-typescript \
+  --rm \
+  --tty \
+  ghcr.io/krisalyssa/aoc/aoc-typescript:${AOC_TAG}
