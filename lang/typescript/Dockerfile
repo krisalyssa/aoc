@@ -28,7 +28,10 @@ COPY --chown=aoc:aoc bin $DOCKER_APP_ROOT/bin
 USER aoc
 
 RUN \
-  mkdir -p /aoc/data && \
-  mkdir -p /aoc/src/.build
+  mkdir -p /home/aoc/.cache && \
+  mkdir -p $DOCKER_APP_ROOT/src && \
+  mkdir -p $DOCKER_APP_ROOT/data && \
+  cd $DOCKER_APP_ROOT/src && \
+  sudo corepack enable
 
 ENTRYPOINT ["/bin/bash"]
