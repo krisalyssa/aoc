@@ -1,0 +1,24 @@
+#!/bin/bash
+
+usage() {
+  echo "usage: init" 2>&1
+  exit 1
+}
+
+cd /aoc/src
+
+# sudo corepack enable
+corepack prepare yarn@stable --activate
+yarn init -2
+
+yarn config set enableGlobalCache false
+sed -i -r -e 's:^#(!\.yarn/cache):\1:' -e 's:^(\.pnp\.\*):#\1:' .gitignore
+
+jq '.name = "aoc" | .main = "index.ts" | .scripts = {solve: "ts-node index.ts"}' package.json > package.json.new
+rm package.json
+mv package.json.new package.json
+
+yarn add \
+  @types/node \
+  ts-node \
+  typescript
