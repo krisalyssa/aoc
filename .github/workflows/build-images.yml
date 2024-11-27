@@ -138,21 +138,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - if: steps.vars.outputs.release == 'false'
-        name: build image for testing
-        uses: docker/build-push-action@v6
-        with:
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-          context: lang/${{ matrix.lang }}
-          platforms: |
-            linux/amd64
-            linux/arm64
-          push: true
-          tags: ${{ join(fromJSON(steps.vars.outputs.tags), ',') }}
-
-      - if: steps.vars.outputs.release == 'true'
-        name: build image for release
+      - name: build and push image
         uses: docker/build-push-action@v6
         with:
           cache-from: type=local,src=/tmp/.buildx-cache
