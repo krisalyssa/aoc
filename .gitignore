@@ -10,3 +10,14 @@ years/**/data/*.txt
 .clj-kondo
 .lsp
 /.vscode
+
+# typescript
+
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+!.yarn/cache
+# .pnp.*
