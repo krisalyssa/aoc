@@ -1,68 +1,107 @@
-import { existsSync } from "fs"
-import * as path from "path"
+import { Command } from '@commander-js/extra-typings'
+import { access, constants, existsSync } from 'fs'
+import * as path from 'path'
 
-function appDir() {
-	let dir = __dirname;
-	while (!existsSync(path.join(dir, "package.json"))) {
-		dir = path.dirname(dir);
-	}
-	return dir;
-}
+const program = new Command()
+  .name('day')
+  .usage('[options] <day>')
+  .option('-1, --part1', 'run only part 1')
+  .option('-2, --part2', 'run only part 2')
+  .option('-v, --verbose', 'increase output (use multiple times for more output)', increaseVerbose, 0)
 
-function dayModule(day: number, rootDir = appDir()) {
-	const dayWithLeadingZeros = String(day).padStart(2, "0");
-	return path.join(rootDir, "days", dayWithLeadingZeros);
-}
+program.parse(process.argv)
 
-function usage(exitCode: number = 1) {
-  console.log("usage: index.ts [ -p1 | -p2 ] <day>")
-  process.exit(exitCode)
-}
+const options = program.opts()
 
 // global variables
 let day: number | undefined
 let runPart1 = true
 let runPart2 = true
+let verbose: number = (options.verbose === true ? 1 : options.verbose)
 
-// remove the equivalent of argv[0]
-const args = process.argv.slice(2)
+if (options.part1) {
+  runPart1 = true
+  runPart2 = false
+} else if (options.part2) {
+  runPart1 = false
+  runPart2 = true
+}
 
-for (const a of args) {
-  const arg = a.trim()
-
-  if (arg === "--help" || arg === "-h" || arg === "-?") {
-    usage(0)
-  } else if (arg === "--part1" || arg === "-p1") {
-    runPart1 = true
-    runPart2 = false
-  } else if (arg === "--part2" || arg === "-p2") {
-    runPart1 = false
-    runPart2 = true
-  } else {
-    const num = Number(arg)
-    if (Number.isInteger(num) && (num >= 1) && (num <= 25)) {
-      day = num
-    } else {
-      usage()
-    }
-  }
+const num = Number(program.args[0])
+if (Number.isInteger(num) && (num >= 1) && (num <= 25)) {
+  day = num
+} else {
+  program
+    .addHelpText('beforeAll', `
+<day> must be a number between 1 and 25, inclusive
+`)
+    .help({ error: true })
 }
 
 if (day === undefined) {
   // set day to current day of the month?
-  usage()
+  program
+    .addHelpText('beforeAll', `
+<day> is required
+`)
+    .help({ error: true })
 }
 
-console.log(`loading module ${dayModule(day!)}`)
-const dayCode = require(dayModule(day!))
+const moduleName = dayModule(day!)
+access(`${moduleName}.ts`, constants.R_OK, (err) => {
+  if (err) {
+    program
+      .addHelpText('beforeAll', `
+${moduleName}.ts not found
+`)
+      .help({ error: true })
+  } else {
+    if (verbose >= 2) {
+      console.log(`loading module ${moduleName}`)
+    }
 
-if (!runPart2) {
-  console.log(`running code for day ${day} part 1`)
-  dayCode.runPart1()
-} else if (!runPart1) {
-  console.log(`running code for day ${day} part 2`)
-  dayCode.runPart2()
-} else {
-  console.log(`running code for day ${day}`)
-  dayCode.run()
+    const dayCode = require(moduleName)
+
+    if (!runPart2) {
+      if (verbose >= 1) {
+        console.log(`running code for day ${day} part 1`)
+      }
+
+      dayCode.runPart1()
+    } else if (!runPart1) {
+      if (verbose >= 1) {
+        console.log(`running code for day ${day} part 2`)
+      }
+
+      dayCode.runPart2()
+    } else {
+      if (verbose >= 1) {
+        console.log(`running code for day ${day}`)
+      }
+
+      dayCode.run()
+    }
+  }
+})
+
+function appDir() {
+  let dir = __dirname
+  while (!existsSync(path.join(dir, 'package.json'))) {
+    dir = path.dirname(dir)
+  }
+  return dir
+}
+
+function dayModule(day: number, rootDir = appDir()) {
+  const dayWithLeadingZeros = String(day).padStart(2, '0')
+  return path.join(rootDir, 'days', dayWithLeadingZeros)
+}
+
+function increaseVerbose(_: any, previousValue: number) {
+  return previousValue + 1
+}
+
+function usage(exitCode: number = 1) {
+  console.log('usage: index.ts [ -p1 | -p2 ] <day>')
+  process.exit(exitCode)
 }
