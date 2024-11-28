@@ -19,6 +19,19 @@ rm package.json
 mv package.json.new package.json
 
 yarn add \
-  @types/node \
+  commander \
   ts-node \
   typescript
+
+yarn add --dev \
+  @commander-js/extra-typings \
+  @types/eslint \
+  @types/eslint-config-prettier \
+  @types/node \
+  eslint \
+  eslint-config-prettier
+
+yarn add --dev --exact \
+  prettier
+
+yarn dlx @yarnpkg/sdks vscode vim
