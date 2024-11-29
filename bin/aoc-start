@@ -1,4 +1,4 @@
-#!env bash
+#!/usr/bin/env bash
 
 ##
 ## start a container for a language
