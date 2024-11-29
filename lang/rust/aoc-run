@@ -64,29 +64,29 @@ elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
   usage
 elif [[ -z "${AOC_DAY}" ]]; then
   usage
-else
-  # strip leading zero, if any, for proper numeric comparisons
-  [[ -n "${AOC_DAY}" ]] && AOC_DAY=$((AOC_DAY + 0))
-
-  if ((AOC_DAY < 1 || AOC_DAY > 25)); then
-    echo "day out of range"
-    usage
-  elif ((AOC_YEAR == CURRENT_YEAR && AOC_DAY > CURRENT_DAY)); then
-    echo "day ${AOC_DAY} hasn't been released yet"
-    usage
-  fi
-
-  # now that we're done comparing numbers, force day to two digits
-  AOC_DAY=$(printf "%02d" ${AOC_DAY})
-
-  docker run \
-    --interactive \
-    --mount type=bind,src=./years/${AOC_YEAR}/rust,dst=/aoc/src \
-    --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-    --mount type=volume,src=rust-${AOC_YEAR}-target,dst=/aoc/src/target \
-    --name aoc-rust \
-    --rm \
-    --tty \
-    ghcr.io/krisalyssa/aoc/aoc-rust:${AOC_TAG} \
-    -c "bin/run ${AOC_DAY}"
 fi
+
+# strip leading zero, if any, for proper numeric comparisons
+[[ -n "${AOC_DAY}" ]] && AOC_DAY=$((AOC_DAY + 0))
+
+if ((AOC_DAY < 1 || AOC_DAY > 25)); then
+  echo "day out of range"
+  usage
+elif ((AOC_YEAR == CURRENT_YEAR && AOC_DAY > CURRENT_DAY)); then
+  echo "day ${AOC_DAY} hasn't been released yet"
+  usage
+fi
+
+# now that we're done comparing numbers, force day to two digits
+AOC_DAY=$(printf "%02d" ${AOC_DAY})
+
+docker run \
+  --interactive \
+  --mount type=bind,src=./years/${AOC_YEAR}/rust,dst=/aoc/src \
+  --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
+  --mount type=volume,src=rust-${AOC_YEAR}-target,dst=/aoc/src/target \
+  --name aoc-rust \
+  --rm \
+  --tty \
+  ghcr.io/krisalyssa/aoc/aoc-rust:${AOC_TAG} \
+  -c "bin/run ${AOC_DAY}"
