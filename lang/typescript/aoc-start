@@ -5,11 +5,6 @@
 usage() {
   local exitcode=${1:-1}
 
-  langs=()
-  for filename in $( find lang -type f -name 'Dockerfile' ); do
-    langs+=("$( basename $( dirname ${filename} ) )")
-  done
-
   echo "usage: aoc-start [ -y <year> ] [ -t <tag> ]"
   echo ""
   echo "Starts a Docker container with data files mounted."
