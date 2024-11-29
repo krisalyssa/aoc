@@ -1,4 +1,4 @@
-#!env bash
+#!/usr/bin/env bash
 
 ##
 ## log in to adventofcode.com to get a session token
@@ -28,6 +28,7 @@ select site in GitHub Google Reddit Twitter; do
   esac
 done
 
+## only for macOS -- need options for other OSes
 echo "Opening Safari so you can log in..."
 open -a Safari ${URL}
 

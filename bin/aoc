@@ -1,4 +1,4 @@
-#!env bash
+#!/usr/bin/env bash
 
 AOC_PREFIX="$( dirname $0 )"
 
