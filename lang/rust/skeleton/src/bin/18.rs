@@ -22,22 +22,22 @@ pub fn main() {
     }
 }
 
-pub fn part_1(data: &[&str]) -> u64 {
+pub fn part_1(data: &[&str]) -> i64 {
     let parsed_data: Vec<u32> = data
         .iter()
         .filter_map(|value| value.parse::<u32>().ok())
         .collect();
 
-    parsed_data.len() as u64
+    parsed_data.len() as i64
 }
 
-pub fn part_2(data: &[&str]) -> u64 {
+pub fn part_2(data: &[&str]) -> i64 {
     let parsed_data: Vec<u32> = data
         .iter()
         .filter_map(|value| value.parse::<u32>().ok())
         .collect();
 
-    parsed_data.len() as u64
+    parsed_data.len() as i64
 }
 
 #[cfg(test)]
