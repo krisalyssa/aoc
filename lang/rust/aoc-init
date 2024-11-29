@@ -55,12 +55,11 @@ elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
 fi
 
 ##
-## iniitalization that can take place outside the container
+## initalization that can take place outside the container
 ##
 
 mkdir -pv years/${AOC_YEAR}/rust
 cp -pRv lang/rust/skeleton/. years/${AOC_YEAR}/rust
-rm years/${AOC_YEAR}/rust/src/main.rs
 
 ##
 ## now run initialization inside the container
