@@ -1,6 +1,8 @@
-#!/bin/bash
+#!env bash
 
+##
 ## run a solution
+##
 
 usage() {
   local exitcode=${1:-1}
@@ -100,7 +102,7 @@ else
   # now that we're done comparing numbers, force day to two digits
   AOC_DAY=$(printf "%02d" ${AOC_DAY})
 
-  ## TODO: get additional options like --platform from a config file in lang/${AOC_LANG}
+  ## TODO: get additional options like --mount from a config file in lang/${AOC_LANG}
   ##       so we don't need a lang-specific script just for that
 
   docker run \
