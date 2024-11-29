@@ -1,6 +1,8 @@
-#!/bin/bash
+#!env bash
 
+##
 ## pull data
+##
 
 # for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
 CURRENT_YEAR=$(date -I | cut -d '-' -f 1)

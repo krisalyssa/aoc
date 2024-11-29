@@ -1,6 +1,8 @@
-#!/bin/bash
+#!env bash
 
+##
 ## build an image for a language for local testing
+##
 
 usage() {
   local exitcode=${1:-1}

@@ -1,6 +1,8 @@
-#!/bin/bash
+#!env bash
 
+##
 ## run tests
+##
 
 usage() {
   echo "usage: aoc-test <language> <year>"
