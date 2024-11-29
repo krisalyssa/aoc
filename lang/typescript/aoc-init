@@ -55,21 +55,29 @@ elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
 fi
 
 ##
-## language-specific stuff below this point
+## initalization that can take place outside the container
 ##
 
 mkdir -pv years/${AOC_YEAR}/data
 mkdir -pv years/${AOC_YEAR}/typescript
 
-cp -pRv lang/typescript/skeleton/. years/${AOC_YEAR}/typescript
+if [[ -e "years/${AOC_YEAR}/typescript/package.json" ]]; then
+  echo "typescript directory already exists in years/${AOC_YEAR}"
+else
+  cp -pRv lang/typescript/skeleton/. years/${AOC_YEAR}/typescript
 
-docker run \
-  --interactive \
-  --mount type=bind,src=./years/${AOC_YEAR}/typescript,dst=/aoc/src \
-  --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-  --mount type=volume,src=aoc-typescript-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
-  --name aoc-typescript \
-  --rm \
-  --tty \
-  ghcr.io/krisalyssa/aoc/aoc-typescript:${AOC_TAG} \
-  -c "bin/init ${AOC_DAY}"
+  ##
+  ## now run initialization inside the container
+  ##
+
+  docker run \
+    --interactive \
+    --mount type=bind,src=./years/${AOC_YEAR}/typescript,dst=/aoc/src \
+    --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
+    --mount type=volume,src=aoc-typescript-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
+    --name aoc-typescript \
+    --rm \
+    --tty \
+    ghcr.io/krisalyssa/aoc/aoc-typescript:${AOC_TAG} \
+    -c "bin/init ${AOC_DAY}"
+fi

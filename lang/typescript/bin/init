@@ -29,7 +29,9 @@ yarn add --dev \
   @types/eslint-config-prettier \
   @types/node \
   eslint \
-  eslint-config-prettier
+  eslint-config-prettier \
+  jest \
+  ts-jest
 
 yarn add --dev --exact \
   prettier
