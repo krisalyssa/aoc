@@ -13,5 +13,3 @@ cd /aoc/src
 
 # update zig
 # install any packages (does zig have packages?)
-
-zig init
