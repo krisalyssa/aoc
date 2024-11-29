@@ -1,22 +1,20 @@
 #!/bin/bash
 
-## start a container for a language
-
 usage() {
   local exitcode=${1:-1}
 
-  echo "usage: aoc-start [ -y <year> ] [ -t <tag> ]"
+  echo "usage: aoc-init [ -y <year> ] [ -t <tag> ]"
   echo ""
-  echo "Starts a Docker container with data files mounted."
+  echo "Sets up a new AoC environment."
   echo ""
   echo "Options:"
   echo "* -y -- year (defaults to current year)"
-  echo "* -t -- tag for language Docker image (defaults to 'latest')"
+  echo "* -t -- tag for Docker image (defaults to 'latest')"
 
   exit ${exitcode}
 }
 
-while getopts ":hl:t:y:" opt; do
+while getopts ":ht:y:" opt; do
   case ${opt} in
     h ) # help
       usage 0
@@ -56,6 +54,18 @@ elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
   usage
 fi
 
+##
+## iniitalization that can take place outside the container
+##
+
+mkdir -pv years/${AOC_YEAR}/rust
+cp -pRv lang/rust/skeleton/. years/${AOC_YEAR}/rust
+rm years/${AOC_YEAR}/rust/src/main.rs
+
+##
+## now run initialization inside the container
+##
+
 docker run \
   --interactive \
   --mount type=bind,src=./years/${AOC_YEAR}/rust,dst=/aoc/src \
@@ -64,4 +74,5 @@ docker run \
   --name aoc-rust \
   --rm \
   --tty \
-  ghcr.io/krisalyssa/aoc/aoc-rust:${AOC_TAG}
+  ghcr.io/krisalyssa/aoc/aoc-rust:${AOC_TAG} \
+  -c "bin/init ${AOC_DAY}"
