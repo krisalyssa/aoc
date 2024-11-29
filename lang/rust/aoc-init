@@ -55,12 +55,11 @@ elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
 fi
 
 ##
-## iniitalization that can take place outside the container
+## initalization that can take place outside the container
 ##
 
 mkdir -pv years/${AOC_YEAR}/rust
 cp -pRv lang/rust/skeleton/. years/${AOC_YEAR}/rust
-rm years/${AOC_YEAR}/rust/src/main.rs
 
 ##
 ## now run initialization inside the container
@@ -70,7 +69,8 @@ docker run \
   --interactive \
   --mount type=bind,src=./years/${AOC_YEAR}/rust,dst=/aoc/src \
   --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-  --mount type=volume,src=rust-${AOC_YEAR}-target,dst=/aoc/src/target \
+  --mount type=volume,src=aoc-rust-${AOC_YEAR}-cargo-home,dst=/usr/local/cargo \
+  --mount type=volume,src=aoc-rust-${AOC_YEAR}-target,dst=/aoc/src/target \
   --name aoc-rust \
   --rm \
   --tty \
