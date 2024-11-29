@@ -1,4 +1,4 @@
-#!env bash
+#!/usr/bin/env bash
 
 ##
 ## set up a year and language
@@ -8,7 +8,7 @@ usage() {
   local exitcode=${1:-1}
 
   langs=()
-  for filename in $( find lang -type f -name 'Dockerfile' ); do
+  for filename in $( find lang -type f -name 'Dockerfile' | sort ); do
     langs+=("$( basename $( dirname ${filename} ) )")
   done
 
