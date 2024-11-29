@@ -60,7 +60,7 @@ docker run \
   --interactive \
   --mount type=bind,src=./years/${AOC_YEAR}/typescript,dst=/aoc/src \
   --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-  --mount type=volume,src=typescript-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
+  --mount type=volume,src=aoc-typescript-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
   --name aoc-typescript \
   --rm \
   --tty \
