@@ -1,6 +1,8 @@
-#!/bin/bash
+#!env bash
 
+##
 ## start a container for a language
+##
 
 usage() {
   local exitcode=${1:-1}
@@ -76,7 +78,7 @@ elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
   echo "year out of range"
   usage
 else
-  ## TODO: get additional options like --platform from a config file in lang/${AOC_LANG}
+  ## TODO: get additional options like --mount from a config file in lang/${AOC_LANG}
   ##       so we don't need a lang-specific script just for that
 
   docker run \
