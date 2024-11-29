@@ -65,7 +65,7 @@ else
     --mount type=bind,src=./years/${AOC_YEAR}/swift,dst=/aoc/src \
     --mount type=bind,src=/Users/kcottingham/Projects/swift-aoc-common,dst=/aoc/swift-aoc-common \
     --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-    --mount type=volume,src=swift-${AOC_YEAR}--build,dst=/aoc/src/.build \
+    --mount type=volume,src=aoc-swift-${AOC_YEAR}--build,dst=/aoc/src/.build \
     --name aoc-swift \
     --rm \
     --tty \
