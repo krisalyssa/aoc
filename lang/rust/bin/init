@@ -1,0 +1,15 @@
+#!/bin/bash
+
+##
+## initialization which needs to take place inside the container
+##
+
+usage() {
+  echo "usage: init" 2>&1
+  exit 1
+}
+
+cd /aoc/src
+
+rustup update
+cargo add itertools lexer maplit petgraph regex unicode-segmentation

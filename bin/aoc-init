@@ -1,6 +1,8 @@
 #!/bin/bash
 
+##
 ## set up a year and language
+##
 
 usage() {
   local exitcode=${1:-1}
@@ -77,5 +79,16 @@ elif [[ ! -x "lang/${AOC_LANG}/aoc-init" ]]; then
   echo "no init script for ${AOC_LANG}"
   usage
 fi
+
+##
+## language-agnostic year initialization
+##
+
+[[ ! -e years/${AOC_YEAR}/solutions.json ]] && echo "{}" > years/${AOC_YEAR}/solutions.json
+mkdir -pv years/${AOC_YEAR}/data
+
+##
+## language specific initialization
+##
 
 lang/${AOC_LANG}/aoc-init -y ${AOC_YEAR} -t ${AOC_TAG}
