@@ -1,16 +1,13 @@
 #!/bin/bash
 
 usage() {
-  echo "usage: run YEAR DAY" 2>&1
+  echo "usage: run DAY" 2>&1
   exit 1
 }
 
-YEAR=$1
-[[ -z ${YEAR} ]] && usage
-
-DAY=$2
+DAY=$1
 [[ -z ${DAY} ]] && usage
 
-shift 2
+shift 1
 
-cd /aoc/src && lein run -m aoc-${YEAR}.day-${DAY}
+cd /aoc/src && lein run -m day-${DAY}

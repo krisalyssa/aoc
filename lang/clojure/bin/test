@@ -1,13 +1,8 @@
 #!/bin/bash
 
 usage() {
-  echo "usage: test YEAR" 2>&1
+  echo "usage: test" 2>&1
   exit 1
 }
-
-YEAR=$1
-[[ -z ${YEAR} ]] && usage
-
-shift 1
 
 cd /aoc/src && lein test $@
