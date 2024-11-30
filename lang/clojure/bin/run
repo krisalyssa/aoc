@@ -13,4 +13,4 @@ DAY=$2
 
 shift 2
 
-cd years/${YEAR}/clojure && lein run -m aoc-${YEAR}.day-${DAY}
+cd /aoc/src && lein run -m aoc-${YEAR}.day-${DAY}
