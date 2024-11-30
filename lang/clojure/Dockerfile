@@ -19,7 +19,7 @@ RUN \
   mkdir -p $DOCKER_APP_ROOT/bin && \
   mkdir -p $DOCKER_APP_ROOT/src && \
   mkdir -p $DOCKER_APP_ROOT/data
-COPY --chown=aoc:aoc run test $DOCKER_APP_ROOT/bin
+COPY --chown=aoc:aoc run test $DOCKER_APP_ROOT/bin/
 
 USER aoc
 

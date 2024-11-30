@@ -10,4 +10,4 @@ YEAR=$1
 
 shift 1
 
-cd years/${YEAR}/clojure && lein test $@
+cd /aoc/src && lein test $@
