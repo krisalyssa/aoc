@@ -12,18 +12,18 @@ RUN \
   apt-get update -y && \
   apt-get dist-upgrade -y && \
   apt-get install -y \
-    build-essential \
-    curl \
-    git \
-    sudo \
-    unzip \
-    && \
+  build-essential \
+  curl \
+  git \
+  sudo \
+  unzip \
+  && \
   apt-get clean -y && \
   adduser --home /home/aoc --shell /bin/bash aoc && \
   echo "aoc ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/aoc && \
   chown aoc:aoc $DOCKER_APP_ROOT
 
-COPY --chown=aoc:aoc bin $DOCKER_APP_ROOT/bin
+COPY --chown=aoc:aoc bin $DOCKER_APP_ROOT/bin/
 
 USER aoc
 
