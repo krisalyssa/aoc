@@ -29,6 +29,7 @@ USER aoc
 
 RUN \
   mkdir -p ${DOCKER_APP_ROOT}/data && \
-  mkdir -p ${DOCKER_APP_ROOT}/src/target
+  mkdir -p ${DOCKER_APP_ROOT}/src/target && \
+  mkdir -p /home/aoc/.m2
 
 ENTRYPOINT ["/bin/bash"]
