@@ -58,12 +58,12 @@ fi
 ## initalization that can take place outside the container
 ##
 
-mkdir -pv years/${AOC_YEAR}/rust
+mkdir -pv years/${AOC_YEAR}/clojure
 
-if [[ -e "years/${AOC_YEAR}/rust/Cargo.toml" ]]; then
-  echo "rust directory already exists in years/${AOC_YEAR}"
+if [[ -e "years/${AOC_YEAR}/clojure/project.clj" ]]; then
+  echo "clojure directory already exists in years/${AOC_YEAR}"
 else
-  cp -pRv lang/rust/skeleton/. years/${AOC_YEAR}/rust
+  cp -pRv lang/clojure/skeleton/. years/${AOC_YEAR}/clojure
 
   ##
   ## now run initialization inside the container
@@ -71,13 +71,12 @@ else
 
   docker run \
     --interactive \
-    --mount type=bind,src=./years/${AOC_YEAR}/rust,dst=/aoc/src \
+    --mount type=bind,src=./years/${AOC_YEAR}/clojure,dst=/aoc/src \
     --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-    --mount type=volume,src=aoc-rust-${AOC_YEAR}-cargo-home,dst=/usr/local/cargo \
-    --mount type=volume,src=aoc-rust-${AOC_YEAR}-target,dst=/aoc/src/target \
-    --name aoc-rust \
+    --mount type=volume,src=aoc-clojure-${AOC_YEAR}-target,dst=/aoc/src/target \
+    --name aoc-clojure \
     --rm \
     --tty \
-    ghcr.io/krisalyssa/aoc/aoc-rust:${AOC_TAG} \
+    ghcr.io/krisalyssa/aoc/aoc-clojure:${AOC_TAG} \
     -c "bin/init ${AOC_DAY}"
 fi
