@@ -1,0 +1,15 @@
+#!/bin/bash
+
+##
+## initialization which needs to take place inside the container
+##
+
+usage() {
+  echo "usage: init" 2>&1
+  exit 1
+}
+
+cd /aoc/src
+
+mix local.hex --force
+mix do deps.get, deps.compile, compile, credo, dialyzer
