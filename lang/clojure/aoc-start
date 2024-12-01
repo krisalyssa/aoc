@@ -60,9 +60,10 @@ docker run \
   --interactive \
   --mount type=bind,src=./years/${AOC_YEAR}/clojure,dst=/aoc/src \
   --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-  --mount type=volume,src=aoc-clojure-${AOC_YEAR}-m2,dst=/home/aoc/m2 \
+  --mount type=volume,src=aoc-clojure-${AOC_YEAR}-m2,dst=/home/aoc/.m2 \
   --mount type=volume,src=aoc-clojure-${AOC_YEAR}-target,dst=/aoc/src/target \
   --name aoc-clojure \
   --rm \
   --tty \
-  ghcr.io/krisalyssa/aoc/aoc-clojure:${AOC_TAG}
+  ghcr.io/krisalyssa/aoc/aoc-clojure:${AOC_TAG} \
+  -c "bin/start ${AOC_DAY}"
