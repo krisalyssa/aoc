@@ -10,4 +10,4 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && mix run -e "AoC.Day${DAY}.exs"
+cd /aoc/src && mix run -e "AoC.Day${DAY}.run()"
