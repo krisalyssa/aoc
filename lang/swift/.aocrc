@@ -1,0 +1,4 @@
+ADDITIONAL_MOUNTS="\
+  --mount type=bind,src=/Users/kcottingham/Projects/${LANG}-aoc-common,dst=/aoc/${LANG}-aoc-common \
+  --mount type=volume,src=aoc-${LANG}-${YEAR}--build,dst=/aoc/src/.build \
+"
