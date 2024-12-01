@@ -1,13 +1,13 @@
 #!/bin/bash
 
-## run a solution
+## run a test
 
 usage() {
   local exitcode=${1:-1}
 
-  echo "usage: aoc-run [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
+  echo "usage: aoc-test [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
   echo ""
-  echo "Runs code for a year and day."
+  echo "Runs test code for a year and day."
   echo ""
   echo "Options:"
   echo "* -y -- year (defaults to current year)"
@@ -94,4 +94,4 @@ docker run \
   --rm \
   --tty \
   ghcr.io/krisalyssa/aoc/aoc-elixir:${AOC_TAG} \
-  -c "bin/run ${AOC_DAY}"
+  -c "bin/test ${AOC_DAY}"
