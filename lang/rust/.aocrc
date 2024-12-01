@@ -1,5 +1,6 @@
+# code: language=shellscript insertSpaces=true tabSize=2
 ADDITIONAL_MOUNTS="\
-  --mount type=volume,src=aoc-${LANG}-${YEAR}-cargo-home,dst=/usr/local/cargo \
-  --mount type=volume,src=aoc-${LANG}-${YEAR}-rustup-home,dst=/usr/local/rustup \
-  --mount type=volume,src=aoc-${LANG}-${YEAR}-target,dst=/aoc/src/target \
+  --mount type=volume,src=aoc-rust-${YEAR}-cargo-home,dst=/usr/local/cargo \
+  --mount type=volume,src=aoc-rust-${YEAR}-rustup-home,dst=/usr/local/rustup \
+  --mount type=volume,src=aoc-rust-${YEAR}-target,dst=/aoc/src/target \
 "

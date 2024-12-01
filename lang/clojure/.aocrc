@@ -1,4 +1,5 @@
+# code: language=shellscript insertSpaces=true tabSize=2
 ADDITIONAL_MOUNTS="\
-  --mount type=volume,src=aoc-${LANG}-${YEAR}-m2,dst=/home/aoc/.m2 \
-  --mount type=volume,src=aoc-${LANG}-${YEAR}-target,dst=/aoc/src/target \
+  --mount type=volume,src=aoc-clojure-${YEAR}-m2,dst=/home/aoc/.m2 \
+  --mount type=volume,src=aoc-clojure-${YEAR}-target,dst=/aoc/src/target \
 "
