@@ -1,4 +1,5 @@
+# code: language=shellscript insertSpaces=true tabSize=2
 ADDITIONAL_MOUNTS="\
-  --mount type=bind,src=/Users/kcottingham/Projects/${LANG}-aoc-common,dst=/aoc/${LANG}-aoc-common \
-  --mount type=volume,src=aoc-${LANG}-${YEAR}--build,dst=/aoc/src/.build \
+  --mount type=bind,src=/Users/kcottingham/Projects/swift-aoc-common,dst=/aoc/swift-aoc-common \
+  --mount type=volume,src=aoc-swift-${YEAR}--build,dst=/aoc/src/.build \
 "
