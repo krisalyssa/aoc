@@ -1,0 +1,4 @@
+ADDITIONAL_MOUNTS="\
+  --mount type=volume,src=aoc-${LANG}-${YEAR}-m2,dst=/home/aoc/.m2 \
+  --mount type=volume,src=aoc-${LANG}-${YEAR}-target,dst=/aoc/src/target \
+"

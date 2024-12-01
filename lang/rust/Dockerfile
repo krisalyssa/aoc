@@ -29,7 +29,7 @@ RUN \
   chown aoc:aoc ${DOCKER_APP_ROOT}
 # && mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2 \
 
-COPY --chown=aoc:aoc bin ${DOCKER_APP_ROOT}/bin
+COPY --chown=aoc:aoc bin ${DOCKER_APP_ROOT}/bin/
 
 USER aoc
 
