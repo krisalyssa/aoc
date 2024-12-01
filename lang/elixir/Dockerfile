@@ -1,7 +1,7 @@
 FROM elixir:1.17.3-otp-27-alpine AS base
 
 LABEL lang="elixir"
-LABEL version="1.17.3-2"
+LABEL version="1.17.3-3"
 LABEL org.opencontainers.image.source="https://github.com/krisalyssa/aoc"
 LABEL org.opencontainers.image.description="Elixir image for AoC"
 
