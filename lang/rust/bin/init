@@ -11,5 +11,7 @@ usage() {
 
 cd /aoc/src || exit 1
 
-rustup update
 cargo add itertools lexer maplit petgraph regex unicode-segmentation
+
+## I'd rather do this in Dockerfile, but it didn't seem to work that way
+cargo install cargo-expand cargo-show-asm irust
