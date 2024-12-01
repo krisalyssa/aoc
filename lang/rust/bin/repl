@@ -1,0 +1,8 @@
+#!/bin/bash
+
+usage() {
+  echo "usage: repl" 2>&1
+  exit 1
+}
+
+cd /aoc/src && irust
