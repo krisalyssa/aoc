@@ -72,7 +72,6 @@ docker run \
   --mount type=volume,src=aoc-elixir-${AOC_YEAR}-deps,dst=/aoc/src/deps \
   --mount type=volume,src=aoc-elixir-${AOC_YEAR}-mix,dst=/home/aoc/.mix \
   --name aoc-elixir \
-  --rm \
   --tty \
   ghcr.io/krisalyssa/aoc/aoc-elixir:${AOC_TAG} \
   -c "bin/start ${AOC_DAY}"

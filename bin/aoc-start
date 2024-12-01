@@ -94,7 +94,6 @@ else
     --mount type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src \
     --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
     --name aoc-${AOC_LANG} \
-    --rm \
     --tty \
     ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}
 fi
