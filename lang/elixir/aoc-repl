@@ -1,28 +1,23 @@
 #!/bin/bash
 
-## run a solution
+## start a REPL
 
 usage() {
   local exitcode=${1:-1}
 
-  echo "usage: aoc-run [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
+  echo "usage: aoc-repl [ -y <year> ] [ -t <tag> ]"
   echo ""
-  echo "Runs code for a year and day."
+  echo "Starts a Clojure repl for a year."
   echo ""
   echo "Options:"
   echo "* -y -- year (defaults to current year)"
-  echo "* -d -- day (defaults to current day)"
   echo "* -t -- tag for Docker image (defaults to 'latest')"
 
   exit ${exitcode}
 }
 
-while getopts ":d:ht:y:" opt; do
+while getopts ":ht:y:" opt; do
   case ${opt} in
-    d ) # day
-      AOC_DAY=${OPTARG}
-      ;;
-
     h ) # help
       usage 0
       ;;
@@ -50,10 +45,7 @@ shift $((OPTIND -1))
 
 # for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
 CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
-# for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
-CURRENT_DAY=$(date -I | cut -d '-' -f 3)
 
-AOC_DAY=${AOC_DAY:-${CURRENT_DAY}}
 AOC_TAG=${AOC_TAG:-latest}
 AOC_YEAR=${AOC_YEAR:-${CURRENT_YEAR}}
 
@@ -62,26 +54,7 @@ if [[ -z "${AOC_YEAR}" ]]; then
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
   echo "year out of range"
   usage
-elif [[ -z "${AOC_DAY}" ]]; then
-  usage
 fi
-
-# strip leading zero, if any, for proper numeric comparisons
-if [[ -n "${AOC_DAY}" ]]; then
-  AOC_DAY=$( echo "${AOC_DAY}" | sed -E 's/^0//' )
-  AOC_DAY=$((AOC_DAY + 0))
-fi
-
-if ((AOC_DAY < 1 || AOC_DAY > 25)); then
-  echo "day out of range"
-  usage
-elif ((AOC_YEAR == CURRENT_YEAR && AOC_DAY > CURRENT_DAY)); then
-  echo "day ${AOC_DAY} hasn't been released yet"
-  usage
-fi
-
-# now that we're done comparing numbers, force day to two digits
-AOC_DAY=$(printf "%02d" ${AOC_DAY})
 
 docker run \
   --interactive \
@@ -94,4 +67,4 @@ docker run \
   --rm \
   --tty \
   ghcr.io/krisalyssa/aoc/aoc-elixir:${AOC_TAG} \
-  -c "bin/run ${AOC_DAY}"
+  -c "bin/repl ${AOC_DAY}"

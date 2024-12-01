@@ -5,4 +5,9 @@ usage() {
   exit 1
 }
 
-cd /aoc/src && mix test $@
+DAY=$1
+[[ -z ${DAY} ]] && usage
+
+shift 1
+
+cd /aoc/src && mix test test/aoc/day_${DAY}_test.exs

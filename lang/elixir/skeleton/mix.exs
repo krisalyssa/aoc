@@ -10,7 +10,6 @@ defmodule AoC.MixProject do
       elixir: "~> 1.17",
       elixirc_options: [warnings_as_errors: true],
       start_permanent: Mix.env() == :prod,
-      preferred_cli_env: [espec: :test],
       aliases: aliases(),
       deps: deps()
     ]
@@ -24,9 +23,7 @@ defmodule AoC.MixProject do
   end
 
   defp aliases do
-    [
-      test: ["espec"]
-    ]
+    []
   end
 
   # Run "mix help deps" to learn about dependencies.
@@ -34,7 +31,6 @@ defmodule AoC.MixProject do
     [
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:espec, "~> 1.9", only: :test},
       {:exprintf, "~> 0.2.1"},
       {:libgraph, "~> 0.16.0"},
       {:math, git: "https://github.com/krisalyssa/math.git"},
