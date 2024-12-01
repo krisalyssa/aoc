@@ -66,4 +66,5 @@ docker run \
   --name aoc-elixir \
   --rm \
   --tty \
-  ghcr.io/krisalyssa/aoc/aoc-elixir:${AOC_TAG}
+  ghcr.io/krisalyssa/aoc/aoc-elixir:${AOC_TAG} \
+  -c "bin/start ${AOC_DAY}"
