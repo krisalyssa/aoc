@@ -67,7 +67,10 @@ elif [[ -z "${AOC_DAY}" ]]; then
 fi
 
 # strip leading zero, if any, for proper numeric comparisons
-[[ -n "${AOC_DAY}" ]] && AOC_DAY=$((AOC_DAY + 0))
+if [[ -n "${AOC_DAY}" ]]; then
+  AOC_DAY=$( echo "${AOC_DAY}" | sed -E 's/^0//' )
+  AOC_DAY=$((AOC_DAY + 0))
+fi
 
 if ((AOC_DAY < 1 || AOC_DAY > 25)); then
   echo "day out of range"
@@ -84,7 +87,7 @@ docker run \
   --interactive \
   --mount type=bind,src=./years/${AOC_YEAR}/clojure,dst=/aoc/src \
   --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
-  --mount type=volume,src=aoc-clojure-${AOC_YEAR}-m2,dst=/home/aoc/m2 \
+  --mount type=volume,src=aoc-clojure-${AOC_YEAR}-m2,dst=/home/aoc/.m2 \
   --mount type=volume,src=aoc-clojure-${AOC_YEAR}-target,dst=/aoc/src/target \
   --name aoc-clojure \
   --rm \
