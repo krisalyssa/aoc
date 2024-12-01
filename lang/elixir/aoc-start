@@ -5,19 +5,26 @@
 usage() {
   local exitcode=${1:-1}
 
-  echo "usage: aoc-start [ -y <year> ] [ -t <tag> ]"
+  echo "usage: aoc-start [ -y <year> ] [ -t <tag> ] [ -d ]"
   echo ""
   echo "Starts a Docker container with data files mounted."
   echo ""
   echo "Options:"
   echo "* -y -- year (defaults to current year)"
   echo "* -t -- tag for language Docker image (defaults to 'latest')"
+  echo "* -d -- detach the container (run it in the background)"
+  echo ""
+  echo "NOTE: -d does not take a value and is not used to specify a day, unlike other commands."
 
   exit ${exitcode}
 }
 
-while getopts ":hl:t:y:" opt; do
+while getopts ":dhl:t:y:" opt; do
   case ${opt} in
+    d ) # detach
+      DETACH=true
+      ;;
+
     h ) # help
       usage 0
       ;;
@@ -57,6 +64,7 @@ elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
 fi
 
 docker run \
+  ${DETACH:+--detach} \
   --interactive \
   --mount type=bind,src=./years/${AOC_YEAR}/elixir,dst=/aoc/src \
   --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
