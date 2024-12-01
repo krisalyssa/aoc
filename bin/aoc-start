@@ -12,8 +12,8 @@ usage() {
     langs+=("$( basename $( dirname ${filename} ) )")
   done
 
-  echo "usage: aoc-start -l <language> [ -y <year> ] [ -t <tag> ]"
-  echo "       aoc-start [ -y <year> ] [ -t <tag> ] <language>"
+  echo "usage: aoc-start -l <language> [ -y <year> ] [ -t <tag> ] [ -d ]"
+  echo "       aoc-start [ -y <year> ] [ -t <tag> ] [ -d ] <language>"
   echo ""
   echo "Starts a Docker container for the language, with data files mounted."
   echo ""
@@ -21,14 +21,21 @@ usage() {
   echo "* -l -- language"
   echo "* -y -- year (defaults to current year)"
   echo "* -t -- tag for language Docker image (defaults to 'latest')"
+  echo "* -d -- detach the container (run it in the background)"
   echo ""
   echo "<language> must be one of: ${langs[@]}"
+  echo ""
+  echo "NOTE: -d does not take a value and is not used to specify a day, unlike other commands."
 
   exit ${exitcode}
 }
 
-while getopts ":hl:t:y:" opt; do
+while getopts ":dhl:t:y:" opt; do
   case ${opt} in
+    d ) # detach
+      DETACH=true
+      ;;
+
     h ) # help
       usage 0
       ;;
@@ -71,7 +78,7 @@ elif [[ ! -d "lang/${AOC_LANG}" ]]; then
   echo "unknown language ${AOC_LANG}"
   usage
 elif [[ -x "lang/${AOC_LANG}/aoc-start" ]]; then
-  lang/${AOC_LANG}/aoc-start -y ${AOC_YEAR} -t ${AOC_TAG}
+  lang/${AOC_LANG}/aoc-start -y ${AOC_YEAR} -t ${AOC_TAG} ${DETACH:+-d}
 elif [[ -z "${AOC_YEAR}" ]]; then
   usage
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
@@ -82,6 +89,7 @@ else
   ##       so we don't need a lang-specific script just for that
 
   docker run \
+    ${DETACH:+--detach} \
     --interactive \
     --mount type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src \
     --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
