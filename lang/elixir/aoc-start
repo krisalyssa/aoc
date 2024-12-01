@@ -66,8 +66,8 @@ fi
 docker run \
   ${DETACH:+--detach} \
   --interactive \
-  --mount type=bind,src=./years/${AOC_YEAR}/elixir,dst=/aoc/src \
   --mount type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data \
+  --mount type=bind,src=./years/${AOC_YEAR}/elixir,dst=/aoc/src \
   --mount type=volume,src=aoc-elixir-${AOC_YEAR}-build,dst=/aoc/src/_build \
   --mount type=volume,src=aoc-elixir-${AOC_YEAR}-deps,dst=/aoc/src/deps \
   --mount type=volume,src=aoc-elixir-${AOC_YEAR}-mix,dst=/home/aoc/.mix \
