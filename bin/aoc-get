@@ -207,13 +207,13 @@ maybe_fetch() {
 }
 
 verbose() {
-    verbose_gt 0 "$@"
+    verbose_gt 0 "$*"
 }
 
 verbose_gt() {
     local level=$1
     shift
-    [[ ${VERBOSE} -gt ${level} ]] && echo "$@"
+    [[ ${VERBOSE} -gt ${level} ]] && echo "$*"
 }
 
 get_data "${YEAR}" "${DAY}"
