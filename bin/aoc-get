@@ -4,189 +4,216 @@
 ## pull data
 ##
 
-# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
-CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
+usage() {
+    local exitcode=${1:-1}
+
+    echo "usage: aoc-get [ -y <year> [ -d <day> ] ] [ -n ] [ -f ] [ -v ] [ -q ]"
+    echo ""
+    echo "Gets data files."
+    echo ""
+    echo "Options:"
+    echo "* -y -- year, or 'all' (defaults to current year)"
+    echo "* -d -- day, or 'all' (defaults to current day)"
+    echo "* -n -- dry run (show, don't do)"
+    echo "* -f -- force (download a data file even if it exists locally)"
+    echo "* -v -- increase verbosity"
+    echo "* -q -- decrease verbosity"
+
+    exit "${exitcode}"
+}
+
+DAY=
 DRY_RUN=
 FORCE=
-# SESSION_TOKEN=
-VERBOSE=0
+SESSION_TOKEN=
+VERBOSE=1
+YEAR=
 
-[[ -z "${SESSION_TOKEN}" && -r ./.token ]] && SESSION_TOKEN=$(cat ./.token)
+while getopts ":d:fhnqvy:" opt; do
+    case ${opt} in
+        d) # day
+            DAY=${OPTARG}
+            ;;
 
-data_filename() {
-  local year=$1 day=$2
+        f) # force
+            FORCE=true
+            ;;
 
-  echo $(printf "years/%s/data/%02d.txt" "$year" "$day")
-}
+        h) # help
+            usage 0
+            ;;
 
-data_url() {
-  local year=$1 day=$2
-  local stripped_day=$((day + 0))
-  echo "https://adventofcode.com/${year}/day/${stripped_day}/input"
-}
+        n) # dry run
+            DRY_RUN=true
+            ;;
 
-fetch() {
-  local year=$1 day=$2
-  local fn=$(data_filename $year $day)
-  local outfile=$(mktemp)
-  local status_code
-  local url=$(data_url $year $day)
+        q) # quiet
+            VERBOSE=0
+            ;;
 
-  if [[ -n "${DRY_RUN}" ]]; then
-    echo "curl --request GET --cookie \"session=***\" --location --output \"${fn}\" --show-error --silent --write-out \"%{http_code}\" --url \"${url}\""
-  else
-    status_code=$(
-      curl \
-        --request GET \
-        --cookie "session=${SESSION_TOKEN}" \
-        --location \
-        --output "${outfile}" \
-        --show-error \
-        --silent \
-        --write-out "%{http_code}" \
-        --url "${url}"
-    )
+        v) # verbose
+            VERBOSE=$((VERBOSE + 1))
+            ;;
 
-    case "${status_code}" in
-    "200")
-      mkdir -p "$(dirname $fn)"
-      mv "${outfile}" "${fn}"
-      ;;
+        y) # year
+            YEAR=${OPTARG}
+            ;;
 
-    "400")
-      echo "session-token is not valid -- log in again to refresh it"
-      rm ${outfile}
-      exit 1
-      ;;
+        \?)
+            echo "invalid option -${OPTARG}" 1>&2
+            usage
+            ;;
 
-    "404")
-      # 404 is expected if it's the current year and a future day
-      echo "data not found at ${url}"
-      rm ${outfile}
-      exit 1
-      ;;
-
-    *)
-      echo "could not fetch data for ${year} day ${day}: HTTP status code ${status_code}"
-      exit 1
-      ;;
+        :)
+            echo "option ${OPTARG} requires an argument" 1>&2
+            usage
+            ;;
     esac
-  fi
-}
-
-get_all_data() {
-  for year in {2015..2022}; do
-    get_year_data ${year}
-  done
-}
-
-get_data() {
-  local year=$1
-  local day=$2
-
-  if [[ -z ${year} ]]; then
-    get_all_data
-  elif [[ -z ${day} ]]; then
-    get_year_data ${year}
-  else
-    get_day_data ${year} ${day}
-  fi
-}
-
-get_day_data() {
-  local year=$1 day=$2
-
-  verbose_gt 1 "getting data for year ${year} day ${day}"
-  maybe_fetch $1 $2
-}
-
-get_year_data() {
-  local year=$1
-
-  for day in {1..25}; do
-    get_day_data ${year} ${day}
-  done
-}
-
-maybe_fetch() {
-  local year=$1 day=$2
-  local fn=$(data_filename $year $day)
-
-  if [[ ! -f "$fn" || ${FORCE} ]]; then
-    fetch $year $day
-  else
-    verbose "data for ${year} day ${day} has already been fetched; skipping"
-  fi
-}
-
-usage() {
-  local exitcode=${1:-1}
-
-  echo "usage: aoc-get [-f] [-n] [-q] [-v] [year [day]]"
-  echo "       aoc-get -h"
-  echo ""
-  echo "If day is omitted, get data for all days for the year."
-  echo "If year is omitted, get data for all years since and including 2015."
-  echo ""
-  echo "Options:"
-  echo "* -f -- force download of data even if the file exists locally"
-  echo "* -h -- show this help"
-  echo "* -n -- show what will be executed, but don't actually execute it"
-  echo "* -q -- decrease verbosity of output"
-  echo "* -v -- increase verbosity of output"
-
-  exit $exitcode
-}
-
-verbose() {
-  verbose_gt 0 $@
-}
-
-verbose_gt() {
-  local level=$1
-  shift
-  [[ ${VERBOSE} > ${level} ]] && echo $@
-}
-
-while getopts ":fhnqv" opt; do
-  case ${opt} in
-  f) # force
-    FORCE=true
-    ;;
-
-  h) # help
-    usage
-    ;;
-
-  n) # dry run
-    DRY_RUN=true
-    ;;
-
-  q) # quiet
-    VERBOSE=$((VERBOSE - 1))
-    if [[ ${VERBOSE} < 0 ]]; then
-      VERBOSE=0
-    fi
-    ;;
-
-  v) # verbose
-    VERBOSE=$((VERBOSE + 1))
-    ;;
-
-  \?)
-    echo "invalid option -${OPTARG}" 1>&2
-    usage
-    ;;
-
-  :)
-    echo "option ${OPTARG} requires an argument" 1>&2
-    usage
-    ;;
-  esac
 done
 shift $((OPTIND - 1))
 
-YEAR=$1
-DAY=$2
+# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
+# for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
+CURRENT_DAY=$(date -I | cut -d '-' -f 3)
 
-get_data ${YEAR} ${DAY}
+YEAR=${YEAR:-${CURRENT_YEAR}}
+DAY=${DAY:-${CURRENT_DAY}}
+
+[[ -z "${SESSION_TOKEN}" && -r ./.token ]] && SESSION_TOKEN=$(cat ./.token)
+if [[ -z "${SESSION_TOKEN}" ]]; then
+    echo "cannot find session token -- are you logged in?"
+    usage
+fi
+
+data_filename() {
+    local year=$1 day=$2
+    printf "years/%s/data/%02d.txt" "$year" "$day"
+}
+
+data_url() {
+    local year=$1 day=$2
+    local stripped_day=$((day + 0))
+    echo "https://adventofcode.com/${year}/day/${stripped_day}/input"
+}
+
+fetch() {
+    local year=$1 day=$2
+    local fn outfile status_code url
+
+    fn=$(data_filename "${year}" "${day}")
+    outfile=$(mktemp)
+    url=$(data_url "${year}" "${day}")
+
+    if [[ -n "${DRY_RUN}" ]]; then
+        echo "curl --request GET --cookie \"session=***\" --location --output \"${fn}\" --show-error --silent --write-out \"%{http_code}\" --url \"${url}\""
+    else
+        status_code=$(
+            curl \
+                --request GET \
+                --cookie "session=${SESSION_TOKEN}" \
+                --location \
+                --output "${outfile}" \
+                --show-error \
+                --silent \
+                --write-out "%{http_code}" \
+                --url "${url}"
+        )
+
+        case "${status_code}" in
+            "200")
+                mkdir -p "$(dirname "${fn}")"
+                mv "${outfile}" "${fn}"
+                ;;
+
+            "400")
+                echo "session token is not valid -- log in again to refresh it"
+                rm "${outfile}"
+                exit 1
+                ;;
+
+            "404")
+                # 404 is expected if it's the current year and a future day
+                echo "data not found at ${url}"
+                rm "${outfile}"
+                exit 1
+                ;;
+
+            *)
+                echo "could not fetch data for ${year} day ${day}: HTTP status code ${status_code}"
+                exit 1
+                ;;
+        esac
+    fi
+}
+
+get_all_data() {
+    for year in $(eval echo "{2015..${CURRENT_YEAR}}"); do
+        get_year_data "${year}"
+    done
+}
+
+get_data() {
+    local year=$1
+    local day=$2
+
+    [[ -z "${year}" ]] && year=${CURRENT_YEAR}
+    [[ -z "${day}" ]] && day=${CURRENT_DAY}
+
+    if [[ "${year}" == "all" ]]; then
+        get_all_data
+    elif [[ "${day}" == "all" ]]; then
+        get_year_data "${year}"
+    else
+        get_day_data "${year}" "${day}"
+    fi
+}
+
+get_day_data() {
+    local year=$1 day=$2
+
+    # verbose_gt 1 "getting data for year ${year} day ${day}"
+    maybe_fetch $1 $2
+}
+
+get_year_data() {
+    local year=$1 last_day=25
+    local day
+
+    [[ "${year}" == "${CURRENT_YEAR}" ]] && last_day="${CURRENT_DAY}"
+
+    stripped_last_day=$((last_day + 0))
+
+    for day in $(eval echo "{1..${stripped_last_day}}"); do
+        get_day_data "${year}" "${day}"
+    done
+}
+
+maybe_fetch() {
+    local year=$1 day=$2
+    local fn
+
+    fn=$(data_filename "${year}" "${day}")
+
+    echo -n "${year} day ${day}..."
+
+    if [[ ! -f "$fn" || ${FORCE} ]]; then
+        fetch "${year}" "${day}"
+        echo " done."
+    else
+        # verbose "data for ${year} day ${day} has already been fetched; skipping"
+        echo " already downloaded, skipping"
+    fi
+}
+
+verbose() {
+    verbose_gt 0 "$@"
+}
+
+verbose_gt() {
+    local level=$1
+    shift
+    [[ ${VERBOSE} -gt ${level} ]] && echo "$@"
+}
+
+get_data "${YEAR}" "${DAY}"
