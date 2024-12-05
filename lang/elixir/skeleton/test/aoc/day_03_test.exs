@@ -3,18 +3,20 @@ defmodule AoC.Day03.Test do
 
   use ExUnit.Case, async: false
 
+  alias AoC.Day03
+
   # comment this out to always log to the console
   @moduletag :capture_log
 
   describe "part 1" do
     test "with sample data" do
-      assert AoC.Day03.part_1(["../data/03.txt"]) == 1
+      assert Day03.part_1(["../data/03.txt"]) == 1
     end
   end
 
   describe "part 2" do
     test "with sample data" do
-      assert AoC.Day03.part_2(["../data/03.txt"]) == 1
+      assert Day03.part_2(["../data/03.txt"]) == 1
     end
   end
 end
