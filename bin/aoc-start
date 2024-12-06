@@ -72,6 +72,8 @@ AOC_LANG=${AOC_LANG:-$1}
 TAG=${TAG:-latest}
 YEAR=${YEAR:-${CURRENT_YEAR}}
 
+[[ -z "${DETACH}" ]] && REMOVE=true
+
 if [[ -z "${AOC_LANG}" ]]; then
     usage
 elif [[ ! -d "lang/${AOC_LANG}" ]]; then
@@ -122,6 +124,7 @@ else
             --mount "type=bind,src=./years/${YEAR}/data,dst=/aoc/data" \
             ${ADDITIONAL_MOUNTS} \
             --name "${CONTAINER_NAME}" \
+            ${REMOVE:+--rm} \
             --tty \
             ${ADDITIONAL_FLAGS} \
             ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${TAG} \
