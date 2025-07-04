@@ -1,0 +1,28 @@
+name: lint
+on:
+  pull_request: null
+  push: null
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+        with:
+          # super-linter needs the full git history to get the
+          # list of files that changed across commits
+          fetch-depth: 0
+
+      - name: run super-linter
+        uses: super-linter/super-linter/slim@v7.4.0 # x-release-please-version
+        env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ github.token }}
