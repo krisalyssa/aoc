@@ -9,7 +9,7 @@ usage() {
 
     langs=()
     for filename in $(find lang -type f -name 'Dockerfile' | sort); do
-        langs+=("$(basename $(dirname ${filename}))")
+        langs+=("$(basename "$(dirname "${filename}")")")
     done
 
     echo "usage: aoc-build -l <language> [ -t <tag> ]"
@@ -21,9 +21,9 @@ usage() {
     echo "* -l -- language"
     echo "* -t -- tag for language Docker image (defaults to 'local')"
     echo ""
-    echo "<language> must be one of: ${langs[@]}"
+    echo "<language> must be one of: " "${langs[@]}"
 
-    exit ${exitcode}
+    exit "${exitcode}"
 }
 
 while getopts ":hl:t:" opt; do
@@ -61,7 +61,7 @@ if [[ -z "${AOC_LANG}" ]]; then
 elif [[ -d "lang/${AOC_LANG}" ]]; then
     if [[ -x "lang/${AOC_LANG}/build" ]]; then
         shift
-        "lang/${AOC_LANG}/build" $@
+        "lang/${AOC_LANG}/build" "$@"
     elif [[ ! -r "lang/${AOC_LANG}/Dockerfile" ]]; then
         echo "no Dockerfile for language ${AOC_LANG}"
         exit 1

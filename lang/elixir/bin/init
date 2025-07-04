@@ -5,11 +5,12 @@
 ##
 
 usage() {
-  echo "usage: init" 2>&1
-  exit 1
+        echo "usage: init" 2>&1
+        exit 1
 }
 
-cd /aoc/src
+cd /aoc/src || exit 1
 
 mix local.hex --force
+# shellcheck disable=SC1010
 mix do deps.get, deps.compile, compile, credo, dialyzer
