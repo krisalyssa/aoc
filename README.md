@@ -12,6 +12,7 @@ git clone https://github.com/krisalyssa/aoc.git
 
 ```shell
 aoc build elixir
+aoc init -y 2023 elixir
 aoc get
 aoc run -y 2023 -d 1 elixir
 aoc start -y 2023 elixir
@@ -51,6 +52,26 @@ Options:
 - -q -- decrease verbosity of output
 - -v -- increase verbosity of output
 
+### init
+
+Initialize a language and a year. Sets up directory structures and runs any language-specific initialization.
+
+There are two equivalent forms of the subcommand:
+
+```shell
+aoc init -l <language> [ -y <year> ] [ -t <tag> ]
+aoc init [ -y <year> ] [ -t <tag> ] <language>
+```
+
+- If `-y` is not given, `<year>` defaults to the current year.
+- If `-t` is not given, `<tag>` defaults to `latest`.
+
+> Note: This subcommand **must** be idempotent.
+
+### login
+
+### repl
+
 ### run
 
 Runs code for a year, day, and language.
@@ -89,6 +110,8 @@ aoc start [ -y <year> ] [ -t <tag> ] <language>
 - If `-y` is not given, `<year>` defaults to the current year.
 - If `-t` is not given, `<tag>` defaults to `latest`.
 
+### test
+
 ## ADDING A LANGUAGE
 
 - Create a directory in `lang`.
@@ -118,6 +141,8 @@ I decided to see if I could leverage [Docker](https://www.docker.com). Several a
 
 ### Authenticate
 
+#### adventofcode.com
+
 Follow these instructions to get your auth token and paste it in the prompt below.
 
 1. Open <https://adventofcode.com/auth/login> in a web browser.
@@ -128,6 +153,14 @@ Follow these instructions to get your auth token and paste it in the prompt belo
 6. Under Response headers, find the "set-cookie" header and look for a string starting with "session=".
 7. Paste everything after "session=" until the semicolon into the prompt below.
 
+#### ghcr.io
+
+```shell
+cat $HOME/.github/krisalyssa.token | docker login -u krisalyssa --password-stdin ghcr.io
+```
+
 ## ROADMAP
 
 - [ ] `aoc-get` to fetch data
+- [ ] add ghcr.io authentication to any command which needs to access it
+- [ ] add Super-Linter workflow
