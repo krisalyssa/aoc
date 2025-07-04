@@ -56,6 +56,18 @@ Options:
 
 Initialize a language and a year. Sets up directory structures and runs any language-specific initialization.
 
+There are two equivalent forms of the subcommand:
+
+```shell
+aoc init -l <language> [ -y <year> ] [ -t <tag> ]
+aoc init [ -y <year> ] [ -t <tag> ] <language>
+```
+
+- If `-y` is not given, `<year>` defaults to the current year.
+- If `-t` is not given, `<tag>` defaults to `latest`.
+
+> Note: This subcommand **must** be idempotent.
+
 ### login
 
 ### repl
