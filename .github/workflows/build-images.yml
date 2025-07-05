@@ -39,18 +39,16 @@ jobs:
         id: vars
         shell: bash
         run: |
-          # shellcheck disable=SC2044,SC2046,SC2086,SC2116,SC2206
           langs=()
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.languages }}" ]]; then
-            languages=$( echo "${{ github.event.inputs.languages }}" | sed -e 's/,/ /g' )
-            for lang in $( echo ${languages} ); do
-              langs+=(${lang})
+            for lang in $( echo "${{ github.event.inputs.languages }}" | sed -e 's/,/ /g' ); do
+              langs+=("${lang}")
             done
           else
-            for filename in $( find lang -type f -name 'Dockerfile' ); do
-              langs+=("$( basename $( dirname ${filename} ) )")
-            done
+            while IFS= read -r -d '' filename; do
+              langs+=("$( basename "$( dirname "${filename}" )" )")
+            done < <( find lang -type f -name 'Dockerfile' -print0 )
           fi
           echo "langs=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${langs[@]}" )" >> "$GITHUB_OUTPUT"
 
