@@ -1,8 +1,8 @@
 #!/bin/bash
 
 usage() {
-  echo "usage: test YEAR" 2>&1
-  exit 1
+        echo "usage: test YEAR" 2>&1
+        exit 1
 }
 
 YEAR=$1
@@ -10,4 +10,4 @@ YEAR=$1
 
 shift 1
 
-cd years/${YEAR}/elixir && mix test $@
+cd "years/${YEAR}/elixir" && mix test "$@"

@@ -7,7 +7,7 @@ usage() {
 
     echo "usage: aoc <command> [params]"
     echo "       aoc -h"
-    exit $exitcode
+    exit "$exitcode"
 }
 
 while getopts ":h" opt; do
@@ -41,5 +41,5 @@ else
         usage
     fi
 
-    ${SCRIPT_FILENAME} $@
+    ${SCRIPT_FILENAME} "$@"
 fi

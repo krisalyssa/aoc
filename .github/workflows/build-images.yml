@@ -42,14 +42,13 @@ jobs:
           langs=()
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.languages }}" ]]; then
-            languages=$( echo "${{ github.event.inputs.languages }}" | sed -e 's/,/ /g' )
-            for lang in $( echo ${languages} ); do
-              langs+=(${lang})
+            for lang in $( echo "${{ github.event.inputs.languages }}" | sed -e 's/,/ /g' ); do
+              langs+=("${lang}")
             done
           else
-            for filename in $( find lang -type f -name 'Dockerfile' ); do
-              langs+=("$( basename $( dirname ${filename} ) )")
-            done
+            while IFS= read -r -d '' filename; do
+              langs+=("$( basename "$( dirname "${filename}" )" )")
+            done < <( find lang -type f -name 'Dockerfile' -print0 )
           fi
           echo "langs=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${langs[@]}" )" >> "$GITHUB_OUTPUT"
 
@@ -86,8 +85,8 @@ jobs:
 
           version=$( grep "LABEL version=" Dockerfile | sed -e 's/LABEL version="\(.*\)"/\1/' -e 's/ //g' )
           if [[ -z "${version// }" ]]; then
-             echo - Failed to get version. Be sure you have a label named "version" in your Dockerfile.
-             exit 1
+            echo - Failed to get version. Be sure you have a label named "version" in your Dockerfile.
+            exit 1
           fi
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
 
@@ -157,14 +156,14 @@ jobs:
           # artifactErrorsFailBuild:
           # artifacts:
           # artifactContentType:
-          body: "`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`"
+          body: '`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`'
           # bodyFile:
           # commit:
           # discussionCategory:
           draft: ${{ steps.vars.outputs.release != 'true' }}
           # generateReleaseNotes:
           # makeLatest:
-          name: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
+          name: '${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}'
           # omitBody:
           # omitBodyDuringUpdate:
           # omitDraftDuringUpdate:
@@ -177,7 +176,7 @@ jobs:
           # replacesArtifacts:
           # repo:
           skipIfReleaseExists: true
-          tag: "${{ steps.vars.outputs.name }}-${{ steps.vars.outputs.version }}"
+          tag: '${{ steps.vars.outputs.name }}-${{ steps.vars.outputs.version }}'
           # token:
           updateOnlyUnreleased: true
 

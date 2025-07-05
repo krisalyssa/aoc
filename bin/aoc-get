@@ -173,7 +173,7 @@ get_day_data() {
     local year=$1 day=$2
 
     # verbose_gt 1 "getting data for year ${year} day ${day}"
-    maybe_fetch $1 $2
+    maybe_fetch "$1" "$2"
 }
 
 get_year_data() {

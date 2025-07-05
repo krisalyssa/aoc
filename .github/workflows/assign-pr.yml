@@ -2,9 +2,9 @@ name: assign-pr
 run-name: automatically assign a PR or issue to its author
 on:
   issues:
-    types: [ opened, reopened ]
+    types: [opened, reopened]
   pull_request_target:
-    types: [ opened, reopened ]
+    types: [opened, reopened]
 permissions:
   issues: write
   pull-requests: write
