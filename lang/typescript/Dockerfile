@@ -1,4 +1,5 @@
 FROM mcr.microsoft.com/devcontainers/typescript-node:1.1.6-22-bullseye AS base
+HEALTHCHECK NONE
 
 LABEL lang="typescript"
 LABEL version="1.1.6-4"
@@ -10,7 +11,7 @@ WORKDIR $DOCKER_APP_ROOT
 
 RUN \
   apt-get update -y && \
-  apt-get dist-upgrade -y && \
+  apt-get upgrade -y && \
   apt-get install -y \
   build-essential \
   curl \

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 usage() {
-  echo "usage: init" 2>&1
-  exit 1
+        echo "usage: init" 2>&1
+        exit 1
 }
 
-cd /aoc/src
+cd /aoc/src || exit 1
 
 # sudo corepack enable
 corepack prepare yarn@stable --activate
@@ -14,26 +14,26 @@ yarn init -2
 yarn config set enableGlobalCache false
 sed -i -r -e 's:^#(!\.yarn/cache):\1:' -e 's:^(\.pnp\.\*):#\1:' .gitignore
 
-jq '.name = "aoc" | .main = "index.ts" | .scripts = {day: "ts-node index.ts"}' package.json > package.json.new
+jq '.name = "aoc" | .main = "index.ts" | .scripts = {day: "ts-node index.ts"}' package.json >package.json.new
 rm package.json
 mv package.json.new package.json
 
 yarn add \
-  commander \
-  ts-node \
-  typescript
+        commander \
+        ts-node \
+        typescript
 
 yarn add --dev \
-  @commander-js/extra-typings \
-  @types/eslint \
-  @types/eslint-config-prettier \
-  @types/node \
-  eslint \
-  eslint-config-prettier \
-  jest \
-  ts-jest
+        @commander-js/extra-typings \
+        @types/eslint \
+        @types/eslint-config-prettier \
+        @types/node \
+        eslint \
+        eslint-config-prettier \
+        jest \
+        ts-jest
 
 yarn add --dev --exact \
-  prettier
+        prettier
 
 yarn dlx @yarnpkg/sdks vscode vim

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 usage() {
-  echo "usage: test DAY" 2>&1
-  exit 1
+        echo "usage: test DAY" 2>&1
+        exit 1
 }
 
 DAY=$1
@@ -10,4 +10,4 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && lein test test/day-${DAY}-test.clj
+cd /aoc/src && lein test "test/day-${DAY}-test.clj"
