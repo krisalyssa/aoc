@@ -1,4 +1,5 @@
 FROM clojure:temurin-23-lein-2.11.2-bullseye-slim AS base
+HEALTHCHECK NONE
 
 LABEL lang="clojure"
 LABEL version="1.11.1-1"
@@ -10,7 +11,7 @@ WORKDIR ${DOCKER_APP_ROOT}
 
 RUN \
   apt-get update -y && \
-  apt-get dist-upgrade -y && \
+  apt-get upgrade -y && \
   apt-get install -y \
   apt-utils \
   autoconf \

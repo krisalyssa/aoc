@@ -86,8 +86,8 @@ jobs:
 
           version=$( grep "LABEL version=" Dockerfile | sed -e 's/LABEL version="\(.*\)"/\1/' -e 's/ //g' )
           if [[ -z "${version// }" ]]; then
-             echo - Failed to get version. Be sure you have a label named "version" in your Dockerfile.
-             exit 1
+            echo - Failed to get version. Be sure you have a label named "version" in your Dockerfile.
+            exit 1
           fi
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
 
