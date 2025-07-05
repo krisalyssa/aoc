@@ -66,19 +66,17 @@ else
         cp -pRv lang/elixir/skeleton/. "years/${AOC_YEAR}/elixir"
 fi
 
-# shellcheck source=lang/elixir/.aocrc
-[[ -r lang/elixir/.aocrc ]] && source lang/elixir/.aocrc
-
 ##
 ## now run initialization inside the container
 ##
 
-# shellcheck disable=SC2086,SC2090
 docker run \
         --interactive \
         --mount type=bind,src="./years/${AOC_YEAR}/elixir",dst=/aoc/src \
         --mount type=bind,src="./years/${AOC_YEAR}/data",dst=/aoc/data \
-        ${ADDITIONAL_MOUNTS} \
+        --mount type=volume,src="aoc-elixir-${AOC_YEAR}-build",dst=/aoc/src/_build \
+        --mount type=volume,src="aoc-elixir-${AOC_YEAR}-deps",dst=/aoc/src/deps \
+        --mount type=volume,src="aoc-elixir-${AOC_YEAR}-mix",dst=/home/aoc/.mix \
         --name aoc-elixir \
         --rm \
         --tty \
