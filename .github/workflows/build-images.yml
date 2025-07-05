@@ -48,6 +48,9 @@ jobs:
     name: build images
     needs: [setup]
     runs-on: ubuntu-latest
+    concurrency:
+      group: build-${{ matrix.lang }}
+      cancel-in-progress: true
     strategy:
       matrix:
         lang: ${{ fromJSON(needs.setup.outputs.matrix) }}
