@@ -39,6 +39,7 @@ jobs:
         id: vars
         shell: bash
         run: |
+          # shellcheck disable=SC2044,SC2046,SC2086,SC2116,SC2206
           langs=()
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.languages }}" ]]; then
