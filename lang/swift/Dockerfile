@@ -1,4 +1,5 @@
 FROM swift:6.0.2-noble AS base
+HEALTHCHECK NONE
 
 LABEL lang="swift"
 LABEL version="6.0.2-2"
@@ -10,7 +11,7 @@ WORKDIR $DOCKER_APP_ROOT
 
 RUN \
   apt-get update -y && \
-  apt-get dist-upgrade -y && \
+  apt-get upgrade -y && \
   apt-get install -y \
   build-essential \
   curl \
