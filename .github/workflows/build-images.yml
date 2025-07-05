@@ -24,7 +24,7 @@ jobs:
     name: set up context
     runs-on: ubuntu-latest
     outputs:
-      langs: ${{ steps.vars.outputs.langs }}
+      matrix: ${{ steps.changed-files.outputs.all_changed_files }}
     steps:
       - name: check out code
         uses: actions/checkout@v4
@@ -36,31 +36,13 @@ jobs:
           dir_names: true
           dir_names_exclude_current_dir: true
           matrix: true
+          path: "lang/"
         #   since_last_remote_commit: true
 
-      - name: set variables
-        id: vars
+      - name: log matrix
         shell: bash
         run: |
-          echo "${{ steps.changed-files.outputs.all_changed_files }}"
-
-          langs=()
-
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.languages }}" ]]; then
-            for lang in $( echo "${{ github.event.inputs.languages }}" | sed -e 's/,/ /g' ); do
-              langs+=("${lang}")
-            done
-          else
-            while IFS= read -r -d '' filename; do
-              langs+=("$( basename "$( dirname "${filename}" )" )")
-            done < <( find lang -type f -name 'Dockerfile' -print0 )
-          fi
-          echo "langs=$( jq --compact-output --null-input '$ARGS.positional' --args -- "${langs[@]}" )" >> "$GITHUB_OUTPUT"
-
-      - name: log variables
-        shell: bash
-        run: |
-          echo "langs=${{ steps.vars.outputs.langs }}"
+          echo "matrix=${{ steps.changed-files.outputs.all_changed_files }}"
 
   build:
     name: build images
@@ -68,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lang: ${{ fromJSON(needs.setup.outputs.langs) }}
+        lang: ${{ fromJSON(needs.setup.outputs.matrix) }}
     steps:
       - name: check out code
         uses: actions/checkout@v4
