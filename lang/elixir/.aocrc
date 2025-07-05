@@ -1,6 +1,7 @@
 # code: language=shellscript insertSpaces=true tabSize=2
-ADDITIONAL_MOUNTS="\
-  --mount type=volume,src=aoc-elixir-${YEAR}-build,dst=/aoc/src/_build \
-  --mount type=volume,src=aoc-elixir-${YEAR}-deps,dst=/aoc/src/deps \
-  --mount type=volume,src=aoc-elixir-${YEAR}-mix,dst=/home/aoc/.mix \
+# shellcheck shell=bash
+export ADDITIONAL_MOUNTS="\
+  --mount type=volume,src='aoc-elixir-${YEAR}-build',dst=/aoc/src/_build \
+  --mount type=volume,src='aoc-elixir-${YEAR}-deps',dst=/aoc/src/deps \
+  --mount type=volume,src='aoc-elixir-${YEAR}-mix',dst=/home/aoc/.mix \
 "
