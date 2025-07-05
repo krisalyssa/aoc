@@ -3,11 +3,11 @@ run-name: build docker images
 on:
   pull_request:
     paths:
-      - lang/**/Dockerfile
+      - lang/**
   push:
     branches: [main]
     paths:
-      - lang/**/Dockerfile
+      - lang/**
   workflow_dispatch:
     inputs:
       languages:
