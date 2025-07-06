@@ -77,9 +77,6 @@ if [[ -z "${AOC_YEAR}" ]]; then
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
     echo "year out of range"
     usage
-elif [[ ! -x "lang/${AOC_LANG}/aoc-init" ]]; then
-    echo "no init script for ${AOC_LANG}"
-    usage
 fi
 
 ##
@@ -140,22 +137,24 @@ else
 
     if [[ -z "${AOC_INITIALIZED}" ]]; then
         if [[ -d "lang/${AOC_LANG}/skeleton" ]]; then
-            cp -pRv "lang/${AOC_LANG}/skeleton/." "years/${AOC_YEAR}/${AOC_LANG}"
+            cp -npRv "lang/${AOC_LANG}/skeleton/." "years/${AOC_YEAR}/${AOC_LANG}"
         fi
-
-        ## now run initialization inside the container
-
-        # shellcheck disable=SC2086
-        docker run \
-            --interactive \
-            --mount type=bind,src="./years/${AOC_YEAR}/${AOC_LANG}",dst=/aoc/src \
-            --mount type=bind,src="./years/${AOC_YEAR}/data",dst=/aoc/data \
-            ${ADDITIONAL_MOUNTS} \
-            --name aoc-${AOC_LANG}-${AOC_YEAR} \
-            --rm \
-            --tty \
-            ${ADDITIONAL_FLAGS} \
-            "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-            -c "bin/init"
     fi
+
+    CONTAINER_NAME="aoc-${AOC_LANG}${AOC_YEAR:+-${AOC_YEAR}}"
+
+    ## now run initialization inside the container
+
+    # shellcheck disable=SC2086
+    docker run \
+        --interactive \
+        --mount type=bind,src="./years/${AOC_YEAR}/${AOC_LANG}",dst=/aoc/src \
+        --mount type=bind,src="./years/${AOC_YEAR}/data",dst=/aoc/data \
+        ${ADDITIONAL_MOUNTS} \
+        --name "${CONTAINER_NAME}" \
+        --rm \
+        --tty \
+        ${ADDITIONAL_FLAGS} \
+        "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+        -c "bin/init"
 fi
