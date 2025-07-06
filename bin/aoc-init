@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##
-## set up a year and language
+## set up year for a language
 ##
 
 usage() {
@@ -70,7 +70,9 @@ if [[ -z "${AOC_LANG}" ]]; then
 elif [[ ! -d "lang/${AOC_LANG}" ]]; then
     echo "unknown language ${AOC_LANG}"
     usage
-elif [[ -z "${AOC_YEAR}" ]]; then
+fi
+
+if [[ -z "${AOC_YEAR}" ]]; then
     usage
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
     echo "year out of range"
@@ -116,7 +118,44 @@ EOT
 mkdir -pv "years/${AOC_YEAR}/data"
 
 ##
-## language specific initialization
+## initialization that can take place outside the container
 ##
 
-"lang/${AOC_LANG}/aoc-init" -y "${AOC_YEAR}" -t "${AOC_TAG}"
+mkdir -pv "years/${AOC_YEAR}/${AOC_LANG}"
+unset AOC_INITIALIZED
+
+if [[ -x "lang/${AOC_LANG}/aoc-init" ]]; then
+    "lang/${AOC_LANG}/aoc-init" -y "${AOC_YEAR}" -t "${AOC_TAG}"
+else
+    # shellcheck source=/dev/null
+    if [[ -r "lang/${AOC_LANG}/.aocrc" ]]; then
+        source "lang/${AOC_LANG}/.aocrc"
+        if [[ $(LC_ALL=C type -t already_initialized) == function ]]; then
+            if already_initialized; then
+                echo "${AOC_LANG} directory already exists in years/${AOC_YEAR}"
+                AOC_INITIALIZED=true
+            fi
+        fi
+    fi
+
+    if [[ -z "${AOC_INITIALIZED}" ]]; then
+        if [[ -d "lang/${AOC_LANG}/skeleton" ]]; then
+            cp -pRv "lang/${AOC_LANG}/skeleton/." "years/${AOC_YEAR}/${AOC_LANG}"
+        fi
+
+        ## now run initialization inside the container
+
+        # shellcheck disable=SC2086
+        docker run \
+            --interactive \
+            --mount type=bind,src="./years/${AOC_YEAR}/${AOC_LANG}",dst=/aoc/src \
+            --mount type=bind,src="./years/${AOC_YEAR}/data",dst=/aoc/data \
+            ${ADDITIONAL_MOUNTS} \
+            --name aoc-${AOC_LANG}-${AOC_YEAR} \
+            --rm \
+            --tty \
+            ${ADDITIONAL_FLAGS} \
+            "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+            -c "bin/init"
+    fi
+fi
