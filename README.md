@@ -112,6 +112,24 @@ aoc start [ -y <year> ] [ -t <tag> ] <language>
 
 ### test
 
+Runs unit tests in a Docker container for the language, with data files mounted.
+
+- A Docker container for the language (and tag if `-t` is given) is started.
+- The data directory for the year is mounted at `/aoc/data` in the container.
+- The language's source directory is mounted at `/aoc/src` in the container.
+- The language's `test` script is executed and passed the day on the command line.
+
+There are two equivalent forms of the subcommand:
+
+```shell
+aoc test -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]
+aoc test [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>
+```
+
+- If `-y` is not given, `<year>` defaults to the current year.
+- If `-d` is not given, `<day>` defaults to the current day.
+- If `-t` is not given, `<tag>` defaults to `latest`.
+
 ## ADDING A LANGUAGE
 
 - Create a directory in `lang`.
