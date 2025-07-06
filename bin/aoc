@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+##
+## main command for aoc
+##
+
 AOC_PREFIX="$(dirname "$0")"
 
 usage() {
