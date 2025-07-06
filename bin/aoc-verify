@@ -125,44 +125,39 @@ else
     # shellcheck source=/dev/null
     [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
 
-    unset year_separator
-
     for year in ${AOC_YEAR}; do
-        if [[ -n "${year_separator}" ]]; then
-            printf "%s\n" "${year_separator}"
-        fi
-        printf "%s\n" "${year}"
-
         CONTAINER_NAME="aoc-${AOC_LANG}-${year}"
 
         for day in ${AOC_DAY}; do
             # now that we're done comparing numbers, force day to two digits
             day=$(printf "%02d" "${day}")
 
-            if [[ -n "${day_separator}" ]]; then
-                printf "%s\n" "${day_separator}"
+            OUTPUT=$(
+                # shellcheck disable=SC2086
+                docker run \
+                    --interactive \
+                    --mount "type=bind,src=./years/${year}/${AOC_LANG},dst=/aoc/src" \
+                    --mount "type=bind,src=./years/${year}/data,dst=/aoc/data" \
+                    ${ADDITIONAL_MOUNTS} \
+                    --name "${CONTAINER_NAME}" \
+                    --rm \
+                    --tty \
+                    ${ADDITIONAL_FLAGS} \
+                    "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+                    -c "bin/run ${day}"
+            )
+
+            part_1=$(echo "${OUTPUT}" | jq -r ".day_${day}[0]")
+            solution_1=$(jq -r ".day_${day}[0]" "years/${year}/solutions.json")
+            if [[ "${solution_1}" != "null" && "${part_1}" != "${solution_1}" ]]; then
+                echo "${year}-${day} part 1: ${part_1} should be ${solution_1}"
             fi
-            printf "day %s\n" "${day}"
 
-            # shellcheck disable=SC2086
-            docker run \
-                --interactive \
-                --mount "type=bind,src=./years/${year}/${AOC_LANG},dst=/aoc/src" \
-                --mount "type=bind,src=./years/${year}/data,dst=/aoc/data" \
-                ${ADDITIONAL_MOUNTS} \
-                --name "${CONTAINER_NAME}" \
-                --rm \
-                --tty \
-                ${ADDITIONAL_FLAGS} \
-                "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-                -c "bin/run ${day}"
-
-            jq -r ".day_${day}[0]" "years/${year}/solutions.json"
-            jq -r ".day_${day}[1]" "years/${year}/solutions.json"
-
-            day_separator="----------"
+            part_2=$(echo "${OUTPUT}" | jq -r ".day_${day}[1]")
+            solution_2=$(jq -r ".day_${day}[1]" "years/${year}/solutions.json")
+            if [[ "${solution_2}" != "null" && "${part_2}" != "${solution_2}" ]]; then
+                echo "${year}-${day} part 2: ${part_2} should be ${solution_2}"
+            fi
         done
-
-        year_separator="=========="
     done
 fi
