@@ -150,6 +150,19 @@ aoc test [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>
 - If `-d` is not given, `<day>` defaults to the current day.
 - If `-t` is not given, `<tag>` defaults to `latest`.
 
+### verify
+
+Runs code and compares their outputs to known solutions.
+
+```shell
+aoc verify -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]
+aoc verify [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>
+```
+
+- If `-y` is not given, `<year>` defaults to the current year.
+- If `-d` is not given, `<day>` defaults to the current day.
+- If `-t` is not given, `<tag>` defaults to `latest`.
+
 ## ADDING A LANGUAGE
 
 - Create a directory in `lang`.
@@ -203,3 +216,4 @@ cat $HOME/.github/krisalyssa.token | docker login -u krisalyssa --password-stdin
 - [ ] add ghcr.io authentication to any command which needs to access it
 - [X] add Super-Linter workflow
 - [ ] separate infrastructure from solution code
+- [ ] add support for JSON output in solution code (for `aoc verify`)

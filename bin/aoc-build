@@ -8,9 +8,9 @@ usage() {
     local exitcode=${1:-1}
 
     langs=()
-    for filename in $(find lang -type f -name 'Dockerfile' | sort); do
+    while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
-    done
+    done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
 
     echo "usage: aoc-build -l <language> [ -t <tag> ]"
     echo "       aoc-build [ -t <tag> ] <language>"

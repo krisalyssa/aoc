@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+##
+## verify solutions
+##
+
+usage() {
+    local exitcode=${1:-1}
+
+    langs=()
+    while IFS= read -r -d '' filename; do
+        langs+=("$(basename "$(dirname "${filename}")")")
+    done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
+
+    echo "usage: aoc-verify -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
+    echo "       aoc-verify [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>"
+    echo ""
+    echo "Runs code for a year, day, and language and compares it to known solutions. Useful for testing code in new languages or smoke testing changes."
+    echo ""
+    echo "Options:"
+    echo "* -l -- language"
+    echo "* -y -- year (defaults to current year) ('all' is also permitted)"
+    echo "* -d -- day (defaults to current day) ('all' is also permitted)"
+    echo "* -t -- tag for language Docker image (defaults to 'latest')"
+    echo ""
+    echo "<language> must be one of: " "${langs[@]}"
+
+    exit "${exitcode}"
+}
+
+while getopts ":d:hl:t:y:" opt; do
+    case ${opt} in
+        d) # day
+            AOC_DAY=${OPTARG}
+            ;;
+
+        h) # help
+            usage 0
+            ;;
+
+        l) # lang
+            AOC_LANG=${OPTARG}
+            ;;
+
+        t) # tag for lang image
+            AOC_TAG=${OPTARG}
+            ;;
+
+        y) # year
+            AOC_YEAR=${OPTARG}
+            ;;
+
+        \?)
+            echo "invalid option -${OPTARG}" 1>&2
+            usage
+            ;;
+
+        :)
+            echo "option ${OPTARG} requires an argument" 1>&2
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
+# for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
+CURRENT_DAY=$(date -I | cut -d '-' -f 3)
+
+AOC_LANG=${AOC_LANG:-$1}
+AOC_TAG=${AOC_TAG:-latest}
+
+if [[ -z "${AOC_LANG}" ]]; then
+    usage
+elif [[ ! -d "lang/${AOC_LANG}" ]]; then
+    echo "unknown language ${AOC_LANG}"
+    usage
+fi
+
+if [[ -z "${AOC_YEAR}" ]]; then
+    AOC_YEAR="${CURRENT_YEAR}"
+elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
+    echo "year out of range"
+    usage
+fi
+
+if [[ -z "${AOC_DAY}" ]]; then
+    if [[ "${AOC_YEAR}" == "${CURRENT_YEAR}" ]]; then
+        AOC_DAY="${CURRENT_DAY}"
+    else
+        AOC_DAY="all"
+    fi
+elif [[ "${AOC_DAY}" == "all" ]]; then
+    # run for all days
+    true
+else
+    # strip leading zero, if any, for proper numeric comparisons
+    AOC_DAY=$((AOC_DAY + 0))
+
+    if ((AOC_DAY < 1 || AOC_DAY > 25)); then
+        echo "day out of range"
+        usage
+    elif ((AOC_YEAR == CURRENT_YEAR && AOC_DAY > CURRENT_DAY)); then
+        echo "day ${AOC_DAY} hasn't been released yet"
+        usage
+    fi
+fi
+
+if [[ -x "lang/${AOC_LANG}/aoc-verify" ]]; then
+    "lang/${AOC_LANG}/aoc-verify" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
+else
+    if [[ "${AOC_YEAR}" == "all" ]]; then
+        AOC_YEAR=$(seq 2015 "${CURRENT_DAY}")
+    fi
+
+    if [[ "${AOC_DAY}" == "all" ]]; then
+        if [[ "${AOC_YEAR}" == "${CURRENT_YEAR}" ]]; then
+            AOC_DAY=$(seq 1 "${CURRENT_DAY}")
+        else
+            AOC_DAY=$(seq 1 25)
+        fi
+    fi
+
+    # shellcheck source=/dev/null
+    [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
+
+    unset year_separator
+
+    for year in ${AOC_YEAR}; do
+        if [[ -n "${year_separator}" ]]; then
+            printf "%s\n" "${year_separator}"
+        fi
+        printf "%s\n" "${year}"
+
+        CONTAINER_NAME="aoc-${AOC_LANG}-${year}"
+
+        for day in ${AOC_DAY}; do
+            # now that we're done comparing numbers, force day to two digits
+            day=$(printf "%02d" "${day}")
+
+            if [[ -n "${day_separator}" ]]; then
+                printf "%s\n" "${day_separator}"
+            fi
+            printf "day %s\n" "${day}"
+
+            # shellcheck disable=SC2086
+            docker run \
+                --interactive \
+                --mount "type=bind,src=./years/${year}/${AOC_LANG},dst=/aoc/src" \
+                --mount "type=bind,src=./years/${year}/data,dst=/aoc/data" \
+                ${ADDITIONAL_MOUNTS} \
+                --name "${CONTAINER_NAME}" \
+                --rm \
+                --tty \
+                ${ADDITIONAL_FLAGS} \
+                "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+                -c "bin/run ${day}"
+
+            jq -r ".day_${day}[0]" "years/${year}/solutions.json"
+            jq -r ".day_${day}[1]" "years/${year}/solutions.json"
+
+            day_separator="----------"
+        done
+
+        year_separator="=========="
+    done
+fi
