@@ -201,4 +201,5 @@ cat $HOME/.github/krisalyssa.token | docker login -u krisalyssa --password-stdin
 
 - [ ] `aoc-get` to fetch data
 - [ ] add ghcr.io authentication to any command which needs to access it
-- [ ] add Super-Linter workflow
+- [X] add Super-Linter workflow
+- [ ] separate infrastructure from solution code

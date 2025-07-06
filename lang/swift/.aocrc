@@ -1,5 +1,18 @@
 # code: language=shellscript insertSpaces=true tabSize=2
-ADDITIONAL_MOUNTS="\
-  --mount type=bind,src=/Users/kcottingham/Projects/swift-aoc-common,dst=/aoc/swift-aoc-common \
-  --mount type=volume,src=aoc-swift-${YEAR}--build,dst=/aoc/src/.build \
-"
+# shellcheck shell=bash
+
+already_initialized() {
+        # if [[ -e "years/${AOC_YEAR}/rust/Cargo.toml" ]]; then
+        #         return 1
+        # else
+        return 0
+        # fi
+}
+declare -x already_initialized
+
+if [[ -n "${AOC_YEAR}" ]]; then
+        export ADDITIONAL_MOUNTS="\
+--mount type=bind,src=/Users/kcottingham/Projects/swift-aoc-common,dst=/aoc/swift-aoc-common \
+--mount type=volume,src=aoc-swift-${AOC_YEAR}-build,dst=/aoc/src/.build \
+  "
+fi
