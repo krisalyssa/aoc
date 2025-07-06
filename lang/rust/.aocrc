@@ -1,6 +1,19 @@
 # code: language=shellscript insertSpaces=true tabSize=2
-ADDITIONAL_MOUNTS="\
-  --mount type=volume,src=aoc-rust-${YEAR}-cargo-home,dst=/usr/local/cargo \
-  --mount type=volume,src=aoc-rust-${YEAR}-rustup-home,dst=/usr/local/rustup \
-  --mount type=volume,src=aoc-rust-${YEAR}-target,dst=/aoc/src/target \
-"
+# shellcheck shell=bash
+
+already_initialized() {
+        if [[ -e "years/${AOC_YEAR}/rust/Cargo.toml" ]]; then
+                return 1
+        else
+                return 0
+        fi
+}
+declare -x already_initialized
+
+if [[ -n "${AOC_YEAR}" ]]; then
+        export ADDITIONAL_MOUNTS="\
+--mount type=volume,src=aoc-rust-${AOC_YEAR}-cargo-home,dst=/usr/local/cargo \
+--mount type=volume,src=aoc-rust-${AOC_YEAR}-rustup-home,dst=/usr/local/rustup \
+--mount type=volume,src=aoc-rust-${AOC_YEAR}-target,dst=/aoc/src/target \
+  "
+fi
