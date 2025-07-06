@@ -3,9 +3,9 @@
 
 already_initialized() {
         if [[ -e "years/${AOC_YEAR}/typescript/package.json" ]]; then
-                return 1
-        else
                 return 0
+        else
+                return 1
         fi
 }
 declare -x already_initialized
