@@ -19,7 +19,7 @@ usage() {
     echo ""
     echo "Options:"
     echo "* -l -- language"
-    echo "* -y -- year (defaults to current year)"
+    echo "* -y -- year (defaults to current year) ('none' is also permitted)"
     echo "* -t -- tag for language Docker image (defaults to 'latest')"
     echo "* -d -- detach the container (run it in the background)"
     echo ""
@@ -81,17 +81,20 @@ elif [[ ! -d "lang/${AOC_LANG}" ]]; then
     usage
 fi
 
-if [[ -z "${YEAR}" ]]; then
-    usage
-elif ((YEAR < 2015 || YEAR > CURRENT_YEAR)); then
-    echo "year out of range"
-    usage
-fi
-
 if [[ -x "lang/${AOC_LANG}/aoc-start" ]]; then
     "lang/${AOC_LANG}/aoc-start" -y "${YEAR}" -t "${TAG}" ${DETACH:+-d}
 else
-    CONTAINER_NAME="aoc-${AOC_LANG}-${YEAR}"
+    if [[ -z "${YEAR}" ]]; then
+        usage
+    elif [[ "${YEAR}" == "none" ]]; then
+        echo "starting container without data files"
+        unset YEAR
+    elif ((YEAR < 2015 || YEAR > CURRENT_YEAR)); then
+        echo "year out of range"
+        usage
+    fi
+
+    CONTAINER_NAME="aoc-${AOC_LANG}${YEAR:+-${YEAR}}"
 
     if [[ "$(docker ps --all --format json | jq -r '.Names')" == "${CONTAINER_NAME}" ]]; then
         case $(docker ps --all --format json | jq -r --arg name "${CONTAINER_NAME}" 'select(.Names == $name) | .State') in
@@ -108,10 +111,10 @@ else
         # echo "attaching to container"
         docker attach "${CONTAINER_NAME}"
     else
-        if [[ ! -d "./years/${YEAR}/${AOC_LANG}" ]]; then
-            echo "Lang ${AOC_LANG} is not set up for ${YEAR}."
-            exit 1
-        fi
+        # if [[ ! -d "./years/${YEAR}/${AOC_LANG}" ]]; then
+        #     echo "Lang ${AOC_LANG} is not set up for ${YEAR}."
+        #     exit 1
+        # fi
 
         # shellcheck source=/dev/null
         [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
@@ -120,8 +123,8 @@ else
         docker run \
             ${DETACH:+--detach} \
             --interactive \
-            --mount "type=bind,src=./years/${YEAR}/${AOC_LANG},dst=/aoc/src" \
-            --mount "type=bind,src=./years/${YEAR}/data,dst=/aoc/data" \
+            ${YEAR:+--mount "type=bind,src=./years/${YEAR}/${AOC_LANG},dst=/aoc/src"} \
+            ${YEAR:+--mount "type=bind,src=./years/${YEAR}/data,dst=/aoc/data"} \
             ${ADDITIONAL_MOUNTS} \
             --name "${CONTAINER_NAME}" \
             ${REMOVE:+--rm} \

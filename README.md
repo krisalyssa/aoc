@@ -72,6 +72,24 @@ aoc init [ -y <year> ] [ -t <tag> ] <language>
 
 ### repl
 
+Starts a REPL for a language.
+
+- A Docker container for the language (and tag if `-t` is given) is started.
+- If the requested year is not 'none':
+  - the data directory for the year is mounted at `/aoc/data` in the container; and
+  - the language's source directory is mounted at `/aoc/src` in the container.
+- The language's `repl` script is executed and passed the day on the command line.
+
+There are two equivalent forms of the subcommand:
+
+```shell
+aoc repl -l <language> [ -y <year> ] [ -t <tag> ]
+aoc run [ -y <year> ] [ -t <tag> ] <language>
+```
+
+- If `-y` is not given, `<year>` defaults to the current year. If `<year>` is 'none', no data or source directory is mounted.
+- If `-t` is not given, `<tag>` defaults to `latest`.
+
 ### run
 
 Runs code for a year, day, and language.
@@ -97,8 +115,10 @@ aoc run [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>
 Starts a Docker container for the language, with data files mounted.
 
 - A Docker container for the language (and tag if `-t` is given) is started.
-- The data directory for the year is mounted at `/aoc/data` in the container.
-- The language's source directory is mounted at `/aoc/src` in the container.
+- If the requested year is not 'none':
+  - the data directory for the year is mounted at `/aoc/data` in the container; and
+  - the language's source directory is mounted at `/aoc/src` in the container.
+- The language's `start` script is executed and passed the day on the command line.
 
 There are two equivalent forms of the subcommand:
 
@@ -107,7 +127,7 @@ aoc start -l <language> [ -y <year> ] [ -t <tag> ]
 aoc start [ -y <year> ] [ -t <tag> ] <language>
 ```
 
-- If `-y` is not given, `<year>` defaults to the current year.
+- If `-y` is not given, `<year>` defaults to the current year. If `<year>` is 'none', no data or source directory is mounted.
 - If `-t` is not given, `<tag>` defaults to `latest`.
 
 ### test
