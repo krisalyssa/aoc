@@ -8,11 +8,9 @@ LABEL org.opencontainers.image.description="Rust image for AoC"
 ENV DOCKER_APP_ROOT=/aoc
 WORKDIR ${DOCKER_APP_ROOT}
 
-# bash \
 # gcc \
 # jq \
 # make \
-# musl-dev \
 # tzdata \
 
 RUN \
