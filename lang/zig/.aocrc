@@ -1,0 +1,18 @@
+# code: language=shellscript insertSpaces=true tabSize=2
+# shellcheck shell=bash
+
+already_initialized() {
+        if [[ -e "years/${AOC_YEAR}/zig/build.zig" ]]; then
+                return 0
+        else
+                return 1
+        fi
+}
+declare -x already_initialized
+
+if [[ -n "${AOC_YEAR}" ]]; then
+        export ADDITIONAL_MOUNTS="\
+--mount type=volume,src=aoc-zig-${AOC_YEAR}-zig-cache,dst=/aoc/src/zig-cache \
+--mount type=volume,src=aoc-zig-${AOC_YEAR}-zig-out,dst=/aoc/src/zig-out \
+"
+fi
