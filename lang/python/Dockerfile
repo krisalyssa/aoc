@@ -6,6 +6,7 @@ LABEL org.opencontainers.image.source="https://github.com/krisalyssa/aoc"
 LABEL org.opencontainers.image.description="Python image for AoC"
 
 ENV DOCKER_APP_ROOT=/aoc
+
 WORKDIR ${DOCKER_APP_ROOT}
 
 RUN \
@@ -26,5 +27,7 @@ COPY --chown=aoc:aoc bin ${DOCKER_APP_ROOT}/bin/
 USER aoc
 
 RUN mkdir -p ${DOCKER_APP_ROOT}/data
+
+ENV PYTHONPATH=${DOCKER_APP_ROOT}/src
 
 ENTRYPOINT ["/bin/bash"]
