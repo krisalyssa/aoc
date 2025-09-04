@@ -10,7 +10,7 @@
 # }
 # declare -x already_initialized
 
-export ADDITIONAL_FLAGS="--platform=linux/amd64"
+# export ADDITIONAL_FLAGS="--platform=linux/amd64"
 
 # if [[ -n "${AOC_YEAR}" ]]; then
 #         export ADDITIONAL_MOUNTS="\

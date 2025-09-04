@@ -1,4 +1,4 @@
-FROM julia:1.11.6-alpine3.22 AS base
+FROM julia:1.11.6-trixie AS base
 
 LABEL lang="julia"
 LABEL version="1.11.6"
@@ -8,31 +8,20 @@ LABEL org.opencontainers.image.description="Julia image for AoC"
 ENV DOCKER_APP_ROOT=/aoc
 WORKDIR ${DOCKER_APP_ROOT}
 
-RUN \
-  apk add --update --no-cache \
+RUN apt-get update
+RUN apt-get install --quiet --assume-yes \
   bash \
   curl \
   git \
-  musl-dev \
-  sudo \
-  && \
-  addgroup aoc && \
-  adduser -G aoc -s /bin/bash -D aoc && \
-  echo "aoc ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/aoc && \
-  chown aoc:aoc ${DOCKER_APP_ROOT}
-
-# && mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2 \
-
-# RUN \
-#   rustup update && \
-#   rustup component add rust-src
+  sudo
+RUN useradd --create-home --shell /bin/bash --user-group aoc
+RUN echo "aoc ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/aoc
+RUN chown aoc:aoc ${DOCKER_APP_ROOT}
 
 COPY --chown=aoc:aoc bin ${DOCKER_APP_ROOT}/bin/
 
 USER aoc
 
-RUN \
-  mkdir -p ${DOCKER_APP_ROOT}/data && \
-  mkdir -p ${DOCKER_APP_ROOT}/src/target
+RUN mkdir -p ${DOCKER_APP_ROOT}/data
 
 ENTRYPOINT ["/bin/bash"]
