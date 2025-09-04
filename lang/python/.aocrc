@@ -3,9 +3,9 @@
 
 already_initialized() {
         # if [[ -e "years/${AOC_YEAR}/elixir/mix.exs" ]]; then
-        #         return 1
+        #         return 0
         # else
-        return 0
+        return 1
         # fi
 }
 declare -x already_initialized
