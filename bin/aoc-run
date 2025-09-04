@@ -2,6 +2,7 @@
 
 ##
 ## run a solution for a language, year, and day
+## if there is a container already running, use it?
 ##
 
 usage() {
