@@ -1,6 +1,13 @@
 # AoC Julia
 
+<https://julialang.org/>
+<https://julialang.org/learning/tutorials/>
+<https://docs.julialang.org/en/v1/manual/command-line-interface/>
+<https://docs.julialang.org/en/v1/manual/getting-started/>
+<https://docs.julialang.org/en/v1/stdlib/REPL/>
+<https://pkgdocs.julialang.org/v1/>
 <https://www.matecdev.com/posts/julia-create-project.html>
+<https://techytok.com/lesson-data-structures/>
 
 ## TODO
 
