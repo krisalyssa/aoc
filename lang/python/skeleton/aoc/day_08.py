@@ -1,5 +1,5 @@
 #!env python
-# code: language=python insertSpaces=true tabSize=2
+# code: language=python insertSpaces=true tabSize=4
 
 import io
 import json
