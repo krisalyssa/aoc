@@ -11,8 +11,10 @@ years/**/data/*.txt
 .lsp
 /.vscode
 
-# typescript
+# Python
+/years/**/python/aoc/__pycache__
 
+# typescript
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
