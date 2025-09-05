@@ -1,0 +1,13 @@
+#!/bin/bash
+
+usage() {
+        echo "usage: test" 2>&1
+        exit 1
+}
+
+DAY=$1
+[[ -z ${DAY} ]] && usage
+
+shift 1
+
+cd /aoc/src && python "tests/day_${DAY}_test.py"
