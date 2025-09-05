@@ -11,6 +11,6 @@ usage() {
 
 cd /aoc/src || exit 1
 
-[[ -e ./setup.py.skel ]] && [[ ! -e ./setup.py ]] && mv ./setup.py.skel ./setup.py
-[[ -e ./aoc/__init__.py.skel ]] && [[ ! -e ./aoc/__init__.py ]] && mv ./aoc/__init__.py.skel ./aoc/__init__.py
-[[ -e ./tests/__init__.py.skel ]] && [[ ! -e ./tests/__init__.py ]] && mv ./tests/__init__.py.skel ./tests/__init__.py
+[[ -e /aoc/src/setup.py.skel ]] && [[ ! -e /aoc/src/setup.py ]] && mv -v /aoc/src/setup.py.skel /aoc/src/setup.py
+[[ -e /aoc/src/aoc/__init__.py.skel ]] && [[ ! -e /aoc/src/aoc/__init__.py ]] && mv -v /aoc/src/aoc/__init__.py.skel /aoc/src/aoc/__init__.py
+[[ -e /aoc/src/tests/__init__.py.skel ]] && [[ ! -e /aoc/src/tests/__init__.py ]] && mv -v /aoc/src/tests/__init__.py.skel /aoc/src/tests/__init__.py
