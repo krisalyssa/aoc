@@ -1,0 +1,19 @@
+# code: language=shellscript insertSpaces=true tabSize=2
+# shellcheck shell=bash
+
+already_initialized() {
+        # if [[ -e "years/${AOC_YEAR}/elixir/mix.exs" ]]; then
+        #         return 0
+        # else
+        return 1
+        # fi
+}
+declare -x already_initialized
+
+# if [[ -n "${YEAR}" ]]; then
+#         export ADDITIONAL_MOUNTS="\
+# --mount type=volume,src='aoc-elixir-${YEAR}-build',dst=/aoc/src/_build \
+# --mount type=volume,src='aoc-elixir-${YEAR}-deps',dst=/aoc/src/deps \
+# --mount type=volume,src='aoc-elixir-${YEAR}-mix',dst=/home/aoc/.mix \
+#   "
+# fi
