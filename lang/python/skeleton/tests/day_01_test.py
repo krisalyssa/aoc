@@ -7,8 +7,6 @@ import unittest
 
 
 class TestDay01(unittest.TestCase):
-    test_data = {}
-
     def test_part1(self):
         self.fail("implement test for part1")
 
