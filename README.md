@@ -11,11 +11,16 @@ git clone https://github.com/krisalyssa/aoc.git
 ## USAGE
 
 ```shell
+aoc get
 aoc build elixir
 aoc init -y 2023 elixir
-aoc get
+aoc repl -y 2023 elixir
 aoc run -y 2023 -d 1 elixir
 aoc start -y 2023 elixir
+aoc test -y 2023 elixir
+aoc verify -y 2023 elixir
+
+aoc login
 ```
 
 ## SUBCOMMANDS
@@ -167,10 +172,22 @@ aoc verify [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>
 
 - Create a directory in `lang`.
 - Add a `Dockerfile`, basing it on an official image for the language if possible.
-- Add language-specific `aoc-*` scripts.
 - Add a `bin` directory with container scripts.
+- Add language-specific `aoc-*` scripts, if needed.
 - Add a `skeleton` directory with boilerplate files.
+- Add a `.aocrc` file.
 - Add a `README.md`.
+
+The code for any given year and day, regardless of language, should return a JSON object formatted like
+
+```json
+{
+  "day_01": [
+    138,
+    1771
+  ]
+}
+```
 
 ## DESIGN PHILOSOPHY
 
