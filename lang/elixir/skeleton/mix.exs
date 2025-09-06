@@ -30,6 +30,7 @@ defmodule AoC.MixProject do
   defp deps do
     [
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:csv, "~> 3.2"},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:exprintf, "~> 0.2.1"},
       {:libgraph, "~> 0.16.0"},
