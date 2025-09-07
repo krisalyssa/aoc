@@ -31,7 +31,7 @@ usage() {
 while getopts ":d:hl:t:y:" opt; do
     case ${opt} in
         d) # day
-            DAY=${OPTARG}
+            AOC_DAY=${OPTARG}
             ;;
 
         h) # help
@@ -43,11 +43,11 @@ while getopts ":d:hl:t:y:" opt; do
             ;;
 
         t) # tag for lang image
-            TAG=${OPTARG}
+            AOC_TAG=${OPTARG}
             ;;
 
         y) # year
-            YEAR=${OPTARG}
+            AOC_YEAR=${OPTARG}
             ;;
 
         \?)
@@ -69,9 +69,9 @@ CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
 CURRENT_DAY=$(date -I | cut -d '-' -f 3)
 
 AOC_LANG=${AOC_LANG:-$1}
-TAG=${TAG:-latest}
-YEAR=${YEAR:-${CURRENT_YEAR}}
-DAY=${DAY:-${CURRENT_DAY}}
+AOC_TAG=${AOC_TAG:-latest}
+AOC_YEAR=${AOC_YEAR:-${CURRENT_YEAR}}
+AOC_DAY=${AOC_DAY:-${CURRENT_DAY}}
 
 if [[ -z "${AOC_LANG}" ]]; then
     usage
@@ -80,35 +80,35 @@ elif [[ ! -d "lang/${AOC_LANG}" ]]; then
     usage
 fi
 
-if [[ -z "${YEAR}" ]]; then
+if [[ -z "${AOC_YEAR}" ]]; then
     usage
-elif ((YEAR < 2015 || YEAR > CURRENT_YEAR)); then
+elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
     echo "year out of range"
     usage
 fi
 
-if [[ -z "${DAY}" ]]; then
+if [[ -z "${AOC_DAY}" ]]; then
     usage
 else
     # strip leading zero, if any, for proper numeric comparisons
-    [[ -n "${DAY}" ]] && DAY=$((DAY + 0))
+    [[ -n "${AOC_DAY}" ]] && AOC_DAY=$((AOC_DAY + 0))
 
-    if ((DAY < 1 || DAY > 25)); then
+    if ((AOC_DAY < 1 || AOC_DAY > 25)); then
         echo "day out of range"
         usage
-    elif ((YEAR == CURRENT_YEAR && DAY > CURRENT_DAY)); then
-        echo "day ${DAY} hasn't been released yet"
+    elif ((AOC_YEAR == CURRENT_YEAR && AOC_DAY > CURRENT_DAY)); then
+        echo "day ${AOC_DAY} hasn't been released yet"
         usage
     fi
 fi
 
 if [[ -x "lang/${AOC_LANG}/aoc-test" ]]; then
-    "lang/${AOC_LANG}/aoc-test" -y "${YEAR}" -d "${DAY}" -t "${TAG}"
+    "lang/${AOC_LANG}/aoc-test" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
 else
-    CONTAINER_NAME="aoc-${AOC_LANG}-${YEAR}"
+    CONTAINER_NAME="aoc-${AOC_LANG}-${AOC_YEAR}"
 
     # now that we're done comparing numbers, force day to two digits
-    DAY=$(printf "%02d" "${DAY}")
+    AOC_DAY=$(printf "%02d" "${AOC_DAY}")
 
     # shellcheck source=/dev/null
     [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
@@ -116,13 +116,13 @@ else
     # shellcheck disable=SC2086
     docker run \
         --interactive \
-        --mount "type=bind,src=./years/${YEAR}/${AOC_LANG},dst=/aoc/src" \
-        --mount "type=bind,src=./years/${YEAR}/data,dst=/aoc/data" \
+        --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
+        --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
         ${ADDITIONAL_MOUNTS} \
         --name "${CONTAINER_NAME}" \
         --rm \
         --tty \
         ${ADDITIONAL_FLAGS} \
-        "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${TAG}" \
-        -c "bin/test ${DAY}"
+        "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+        -c "bin/test ${AOC_DAY}"
 fi
