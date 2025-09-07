@@ -1,0 +1,14 @@
+#!/bin/bash
+
+##
+## initialization which needs to take place inside the container
+##
+
+usage() {
+        echo "usage: init" 2>&1
+        exit 1
+}
+
+cd /aoc/src || exit 1
+
+mkdir -p /aoc/src/build
