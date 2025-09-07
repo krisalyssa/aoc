@@ -1,0 +1,12 @@
+#!/bin/bash
+
+##
+## start a REPL
+##
+
+usage() {
+        echo "usage: repl" 2>&1
+        exit 1
+}
+
+cd /aoc/src || exit 1

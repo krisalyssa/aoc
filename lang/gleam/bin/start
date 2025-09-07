@@ -1,0 +1,19 @@
+#!/bin/bash
+
+##
+## start a container
+##
+
+usage() {
+        echo "usage: start" 2>&1
+        exit 1
+}
+
+## why is this needed? other langs don't seem to need it
+sudo chown aoc:aoc /aoc/src/build
+
+if [[ -d /aoc/src ]]; then
+        cd /aoc/src && /bin/bash -i
+else
+        /bin/bash -i
+fi
