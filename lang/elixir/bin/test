@@ -10,4 +10,11 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && mix test "test/aoc/day_${DAY}_test.exs"
+cd /aoc/src || exit 1
+
+if [[ ! -r mix.lock ]]; then
+        # shellcheck disable=SC1010
+        mix do deps.get, deps.compile
+fi
+
+mix test "test/aoc/day_${DAY}_test.exs"
