@@ -1,12 +1,25 @@
 (ns day-01
   (:gen-class))
 
-(defn part1 [_filename]
+(require '[clojure.string :as str])
+
+;; (defn read-file-as-one-string
+;;   "Reads the file and returns it as a single string."
+;;   [filename]
+;;   (str/trim-newline (slurp filename)))
+
+(defn read-file-as-string-list
+  "Reads the file and returns it as a list of strings."
+  [filename]
+  (str/split-lines
+   (slurp filename)))
+
+(defn part1 [_data]
   0)
 
-(defn part2 [_filename]
+(defn part2 [_data]
   0)
 
 (defn -main []
-  (printf "day 01 part 1: %d%n" (part1 "../data/01.txt"))
-  (printf "day 01 part 2: %d%n" (part2 "../data/01.txt")))
+  (printf "day 01 part 1: %d%n" (part1 (read-file-as-string-list "../data/01.txt")))
+  (printf "day 01 part 2: %d%n" (part2 (read-file-as-string-list "../data/01.txt"))))
