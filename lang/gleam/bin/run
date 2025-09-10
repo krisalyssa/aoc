@@ -15,3 +15,5 @@ DAY=$1
 shift 1
 
 cd /aoc/src || exit 1
+
+gleam run -m "day_${DAY}"

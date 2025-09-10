@@ -14,4 +14,4 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && mix test "test/aoc/day_${DAY}_test.exs"
+cd /aoc/src && gleam test
