@@ -10,4 +10,4 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && lein test "test/day-${DAY}-test.clj"
+cd /aoc/src && lein test "test/day_${DAY}_test.clj"
