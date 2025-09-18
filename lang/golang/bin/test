@@ -1,0 +1,19 @@
+#!/bin/bash
+
+##
+## run tests for a given day
+##
+
+usage() {
+        echo "usage: test" 2>&1
+        exit 1
+}
+
+DAY=$1
+[[ -z ${DAY} ]] && usage
+
+shift 1
+
+cd /aoc/src || exit 1
+
+go test "aoc/${AOC_YEAR}/days"
