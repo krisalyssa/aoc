@@ -69,10 +69,10 @@ CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
 # for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
 CURRENT_DAY=$(date -I | cut -d '-' -f 3)
 
-AOC_LANG=${AOC_LANG:-$1}
-AOC_TAG=${AOC_TAG:-latest}
-AOC_YEAR=${AOC_YEAR:-${CURRENT_YEAR}}
-AOC_DAY=${AOC_DAY:-${CURRENT_DAY}}
+export AOC_LANG=${AOC_LANG:-$1}
+export AOC_TAG=${AOC_TAG:-latest}
+export AOC_YEAR=${AOC_YEAR:-${CURRENT_YEAR}}
+export AOC_DAY=${AOC_DAY:-${CURRENT_DAY}}
 
 if [[ -z "${AOC_LANG}" ]]; then
     usage
@@ -116,6 +116,10 @@ else
 
     # shellcheck disable=SC2086
     docker run \
+        --env AOC_DAY \
+        --env AOC_LANG \
+        --env AOC_TAG \
+        --env AOC_YEAR \
         --interactive \
         --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
         --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
