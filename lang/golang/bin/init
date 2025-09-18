@@ -1,0 +1,19 @@
+#!/bin/bash
+
+##
+## initialization which needs to take place inside the container
+##
+
+usage() {
+        echo "usage: init" 2>&1
+        exit 1
+}
+
+cd /aoc/src || exit 1
+
+echo "in bin/init, AOC_YEAR=${AOC_YEAR}"
+ls -l
+
+if [[ ! -r go.mod ]]; then
+        go mod init "aoc/${AOC_YEAR}"
+fi
