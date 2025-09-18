@@ -1,0 +1,16 @@
+#!/bin/bash
+
+##
+## start a container
+##
+
+usage() {
+        echo "usage: start" 2>&1
+        exit 1
+}
+
+if [[ -d /aoc/src ]]; then
+        cd /aoc/src && /bin/bash -i
+else
+        /bin/bash -i
+fi
