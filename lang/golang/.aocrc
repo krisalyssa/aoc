@@ -2,19 +2,18 @@
 # shellcheck shell=bash
 
 already_initialized() {
-        # if [[ -e "years/${AOC_YEAR}/elixir/mix.exs" ]]; then
-        #         return 0
-        # else
-        return 1
-        # fi
+        if [[ -e "years/${AOC_YEAR}/golang/go.mod" ]]; then
+                return 0
+        else
+                return 1
+        fi
 }
 declare -x already_initialized
 
 if [[ -n "${AOC_YEAR}" ]]; then
-        echo "additional mounts go here"
-#         export ADDITIONAL_MOUNTS="\
-# --mount type=volume,src=aoc-elixir-${AOC_YEAR}-build,dst=/aoc/src/_build \
-# --mount type=volume,src=aoc-elixir-${AOC_YEAR}-deps,dst=/aoc/src/deps \
-# --mount type=volume,src=aoc-elixir-${AOC_YEAR}-mix,dst=/home/aoc/.mix \
-# "
+        export ADDITIONAL_MOUNTS="\
+--mount type=volume,src=aoc-go-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
+--mount type=volume,src=aoc-go-${AOC_YEAR}-config,dst=/home/aoc/.config \
+--mount type=volume,src=aoc-go-${AOC_YEAR}-pkg,dst=/go/pkg \
+"
 fi
