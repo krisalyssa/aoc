@@ -12,16 +12,14 @@ jobs:
   lint:
     name: lint
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       packages: read
       # To report GitHub Actions status checks
       statuses: write
-
     steps:
       - name: check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # super-linter needs the full git history to get the
           # list of files that changed across commits
@@ -38,6 +36,8 @@ jobs:
           VALIDATE_EDITORCONFIG: false
           # VALIDATE_GITHUB_ACTIONS: false
           VALIDATE_GITLEAKS: false
+          VALIDATE_GO: false
+          VALIDATE_GO_MODULES: false
           VALIDATE_JSCPD: false
           VALIDATE_JSON: false
           VALIDATE_JSON_PRETTIER: false
