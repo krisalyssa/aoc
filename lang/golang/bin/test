@@ -16,4 +16,4 @@ shift 1
 
 cd /aoc/src || exit 1
 
-go test "aoc/${AOC_YEAR}/days"
+go test "./days/${DAY}"
