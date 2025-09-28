@@ -6,9 +6,15 @@
 
 ```shell
 git clone https://github.com/krisalyssa/aoc.git
+cd aoc
+mkdir -p years # or symlink in your own solutions tree
 ```
 
 ## USAGE
+
+`aoc` assumes that your solution code will be stored in a directory tree rooted in `years`.
+I've removed my solutions from this repository so as not to provide spoilers.
+If you would like to see my solutions, see <https://github.com/krisalyssa/aoc-solutions>.
 
 ```shell
 aoc get
@@ -182,10 +188,7 @@ The code for any given year and day, regardless of language, should return a JSO
 
 ```json
 {
-  "day_01": [
-    138,
-    1771
-  ]
+  "day_01": [138, 1771]
 }
 ```
 
@@ -230,7 +233,5 @@ cat $HOME/.github/krisalyssa.token | docker login -u krisalyssa --password-stdin
 ## ROADMAP
 
 - [ ] `aoc-get` to fetch data
-- [ ] add ghcr.io authentication to any command which needs to access it
-- [X] add Super-Linter workflow
-- [ ] separate infrastructure from solution code
+- [ ] add `ghcr.io` authentication to any command which needs to access it
 - [ ] add support for JSON output in solution code (for `aoc verify`)
