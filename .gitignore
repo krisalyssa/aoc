@@ -1,6 +1,6 @@
 .dccache
 .token
-years/**/data/*.txt
+years
 
 # master copies of devcontainer files are stored in lang/
 .devcontainer/devcontainer.json
