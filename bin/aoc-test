@@ -8,6 +8,7 @@ usage() {
     local exitcode=${1:-1}
 
     langs=()
+    # shellcheck disable=SC2312
     while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
     done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
@@ -59,13 +60,17 @@ while getopts ":d:hl:t:y:" opt; do
             echo "option ${OPTARG} requires an argument" 1>&2
             usage
             ;;
+
+        *) ;;
     esac
 done
 shift $((OPTIND - 1))
 
 # for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+# shellcheck disable=SC2312
 CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
 # for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
+# shellcheck disable=SC2312
 CURRENT_DAY=$(date -I | cut -d '-' -f 3)
 
 export AOC_LANG=${AOC_LANG:-$1}
@@ -122,11 +127,11 @@ else
         --interactive \
         --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
         --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
-        ${ADDITIONAL_MOUNTS} \
+        ${ADDITIONAL_MOUNTS:-} \
         --name "${CONTAINER_NAME}" \
         --rm \
         --tty \
-        ${ADDITIONAL_FLAGS} \
+        ${ADDITIONAL_FLAGS:-} \
         "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
         -c "bin/test ${AOC_DAY}"
 fi

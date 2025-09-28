@@ -8,6 +8,7 @@ usage() {
     local exitcode=${1:-1}
 
     langs=()
+    # shellcheck disable=SC2312
     while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
     done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
@@ -61,11 +62,14 @@ while getopts ":dhl:t:y:" opt; do
             echo "option ${OPTARG} requires an argument" 1>&2
             usage
             ;;
+
+        *) ;;
     esac
 done
 shift $((OPTIND - 1))
 
 # for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+# shellcheck disable=SC2312
 CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
 
 export AOC_LANG=${AOC_LANG:-$1}
@@ -96,6 +100,7 @@ else
 
     CONTAINER_NAME="aoc-${AOC_LANG}${AOC_YEAR:+-${AOC_YEAR}}"
 
+    # shellcheck disable=SC2312
     if [[ "$(docker ps --all --format json | jq -r '.Names')" == "${CONTAINER_NAME}" ]]; then
         case $(docker ps --all --format json | jq -r --arg name "${CONTAINER_NAME}" 'select(.Names == $name) | .State') in
             running)
@@ -106,6 +111,8 @@ else
                 # echo "starting container"
                 docker start "${CONTAINER_NAME}" > /dev/null
                 ;;
+
+            *) ;;
         esac
 
         # echo "attaching to container"
@@ -120,11 +127,11 @@ else
             --interactive \
             --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
             --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
-            ${ADDITIONAL_MOUNTS} \
+            ${ADDITIONAL_MOUNTS:-} \
             --name "${CONTAINER_NAME}" \
             ${REMOVE:+--rm} \
             --tty \
-            ${ADDITIONAL_FLAGS} \
+            ${ADDITIONAL_FLAGS:-} \
             ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG} \
             -c "bin/start"
     fi

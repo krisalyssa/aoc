@@ -68,13 +68,17 @@ while getopts ":d:fhnqvy:" opt; do
             echo "option ${OPTARG} requires an argument" 1>&2
             usage
             ;;
+
+        *) ;;
     esac
 done
 shift $((OPTIND - 1))
 
 # for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+# shellcheck disable=SC2312
 CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
 # for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
+# shellcheck disable=SC2312
 CURRENT_DAY=$(date -I | cut -d '-' -f 3)
 
 export AOC_YEAR=${AOC_YEAR:-${CURRENT_YEAR}}
@@ -110,7 +114,7 @@ fi
 
 data_filename() {
     local year=$1 day=$2
-    printf "years/%s/data/%02d.txt" "$year" "$day"
+    printf "years/%s/data/%02d.txt" "${year}" "${day}"
 }
 
 data_url() {
@@ -219,7 +223,7 @@ maybe_fetch() {
 
     echo -n "${year} day ${day}..."
 
-    if [[ ! -f "$fn" || ${FORCE} ]]; then
+    if [[ ! -f "${fn}" || -n "${FORCE}" ]]; then
         fetch "${year}" "${day}"
         echo " done."
     else
