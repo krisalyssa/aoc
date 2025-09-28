@@ -25,6 +25,8 @@ select site in GitHub Google Reddit Twitter; do
             URL="https://adventofcode.com/auth/twitter"
             break
             ;;
+
+        *) ;;
     esac
 done
 
