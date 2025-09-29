@@ -4,10 +4,10 @@ import * as path from 'path'
 
 const program = new Command()
   .name('day')
-  .usage('[options] <day>')
   .option('-1, --part1', 'run only part 1')
   .option('-2, --part2', 'run only part 2')
   .option('-v, --verbose', 'increase output (use multiple times for more output)', increaseVerbose, 0)
+  .argument('<day')
 
 program.parse(process.argv)
 
