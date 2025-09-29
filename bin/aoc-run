@@ -118,21 +118,50 @@ else
 
     # now that we're done comparing numbers, force day to two digits
     AOC_DAY=$(printf "%02d" "${AOC_DAY}")
+    STATE=
+
+    # shellcheck disable=SC2312
+    if [[ "$(docker ps --all --format json | jq -r '.Names')" == "${CONTAINER_NAME}" ]]; then
+        case $(docker ps --all --format json | jq -r --arg name "${CONTAINER_NAME}" 'select(.Names == $name) | .State') in
+            running)
+                # echo "container is already running"
+                STATE="running"
+                ;;
+
+            exited)
+                # echo "starting container"
+                docker rm "${CONTAINER_NAME}" > /dev/null
+                ;;
+
+            *) ;;
+        esac
+    fi
 
     # shellcheck disable=SC2086
-    docker run \
-        --env AOC_DAY \
-        --env AOC_LANG \
-        --env AOC_TAG \
-        --env AOC_YEAR \
-        --interactive \
-        --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
-        --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
-        ${ADDITIONAL_MOUNTS:-} \
-        --name "${CONTAINER_NAME}" \
-        --rm \
-        --tty \
-        ${ADDITIONAL_FLAGS:-} \
-        "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-        -c "bin/run ${AOC_DAY}"
+    if [[ "${STATE}" == "running" ]]; then
+        docker exec \
+            --env AOC_LANG \
+            --env AOC_TAG \
+            --env AOC_YEAR \
+            --interactive \
+            --tty \
+            ${ADDITIONAL_FLAGS:-} \
+            "${CONTAINER_NAME}" bin/run "${AOC_DAY}"
+    else
+        docker run \
+            --env AOC_DAY \
+            --env AOC_LANG \
+            --env AOC_TAG \
+            --env AOC_YEAR \
+            --interactive \
+            --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
+            --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
+            ${ADDITIONAL_MOUNTS:-} \
+            --name "${CONTAINER_NAME}" \
+            --rm \
+            --tty \
+            ${ADDITIONAL_FLAGS:-} \
+            "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+            -c "bin/run ${AOC_DAY}"
+    fi
 fi

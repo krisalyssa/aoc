@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##
-## start a REPL
+## stop a container for a language
 ##
 
 usage() {
@@ -13,22 +13,21 @@ usage() {
         langs+=("$(basename "$(dirname "${filename}")")")
     done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
 
-    echo "usage: aoc-repl -l <language> [ -y <year> ] [ -t <tag> ]"
-    echo "       aoc-repl [ -y <year> ] [ -t <tag> ] <language>"
+    echo "usage: aoc-stop -l <language> [ -y <year> ]"
+    echo "       aoc-stop [ -y <year> ] <language>"
     echo ""
-    echo "Starts a REPL in a Docker container for the language, with data files mounted."
+    echo "Starts a Docker container for the language, with data files mounted."
     echo ""
     echo "Options:"
     echo "* -l -- language"
-    echo "* -y -- year (defaults to current year) ('none' is also permitted)"
-    echo "* -t -- tag for language Docker image (defaults to 'latest')"
+    echo "* -y -- year (defaults to current year)"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
 
     exit "${exitcode}"
 }
 
-while getopts ":hl:t:y:" opt; do
+while getopts ":dhl:t:y:" opt; do
     case ${opt} in
         h) # help
             usage 0
@@ -36,10 +35,6 @@ while getopts ":hl:t:y:" opt; do
 
         l) # lang
             AOC_LANG=${OPTARG}
-            ;;
-
-        t) # tag for lang image
-            AOC_TAG=${OPTARG}
             ;;
 
         y) # year
@@ -66,7 +61,6 @@ shift $((OPTIND - 1))
 CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
 
 export AOC_LANG=${AOC_LANG:-$1}
-export AOC_TAG=${AOC_TAG:-latest}
 export AOC_YEAR=${AOC_YEAR:-${CURRENT_YEAR}}
 
 if [[ -z "${AOC_LANG}" ]]; then
@@ -76,31 +70,28 @@ elif [[ ! -d "lang/${AOC_LANG}" ]]; then
     usage
 fi
 
-if [[ -x "lang/${AOC_LANG}/aoc-repl" ]]; then
-    "lang/${AOC_LANG}/aoc-repl" -y "${AOC_YEAR}" -t "${AOC_TAG}"
-else
-    if [[ -z "${AOC_YEAR}" ]]; then
-        usage
-    elif [[ "${AOC_YEAR}" == "none" ]]; then
-        echo "starting REPL without data files"
-        unset AOC_YEAR
-    elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
-        echo "year out of range"
-        usage
-    fi
+if [[ -z "${AOC_YEAR}" ]]; then
+    usage
+elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
+    echo "year out of range"
+    usage
+fi
 
+if [[ -x "lang/${AOC_LANG}/aoc-stop" ]]; then
+    "lang/${AOC_LANG}/aoc-stop" -y "${AOC_YEAR}"
+else
     # shellcheck source=/dev/null
     [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
 
     CONTAINER_NAME="aoc-${AOC_LANG}${AOC_YEAR:+-${AOC_YEAR}}"
-    STATE=
 
     # shellcheck disable=SC2312
     if [[ "$(docker ps --all --format json | jq -r '.Names')" == "${CONTAINER_NAME}" ]]; then
         case $(docker ps --all --format json | jq -r --arg name "${CONTAINER_NAME}" 'select(.Names == $name) | .State') in
             running)
                 # echo "container is already running"
-                STATE="running"
+                docker stop "${CONTAINER_NAME}" > /dev/null
+                docker rm "${CONTAINER_NAME}" > /dev/null
                 ;;
 
             exited)
@@ -109,32 +100,5 @@ else
 
             *) ;;
         esac
-    fi
-
-    # shellcheck disable=SC2086
-    if [[ "${STATE}" == "running" ]]; then
-        docker exec \
-            --env AOC_LANG \
-            --env AOC_TAG \
-            --env AOC_YEAR \
-            --interactive \
-            --tty \
-            ${ADDITIONAL_FLAGS:-} \
-            "${CONTAINER_NAME}" "bin/repl"
-    else
-        docker run \
-            --env AOC_LANG \
-            --env AOC_TAG \
-            --env AOC_YEAR \
-            --interactive \
-            ${AOC_YEAR:+--mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src"} \
-            ${AOC_YEAR:+--mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data"} \
-            ${ADDITIONAL_MOUNTS:-} \
-            --name "${CONTAINER_NAME}" \
-            --rm \
-            --tty \
-            ${ADDITIONAL_FLAGS:-} \
-            "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-            -c "bin/repl"
     fi
 fi
