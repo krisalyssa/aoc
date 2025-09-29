@@ -89,24 +89,52 @@ else
         usage
     fi
 
-    CONTAINER_NAME="aoc-${AOC_LANG}${AOC_YEAR:+-${AOC_YEAR}}"
-
     # shellcheck source=/dev/null
     [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
 
+    CONTAINER_NAME="aoc-${AOC_LANG}${AOC_YEAR:+-${AOC_YEAR}}"
+    STATE=
+
+    # shellcheck disable=SC2312
+    if [[ "$(docker ps --all --format json | jq -r '.Names')" == "${CONTAINER_NAME}" ]]; then
+        case $(docker ps --all --format json | jq -r --arg name "${CONTAINER_NAME}" 'select(.Names == $name) | .State') in
+            running)
+                # echo "container is already running"
+                STATE="running"
+                ;;
+
+            exited)
+                docker rm "${CONTAINER_NAME}"
+                ;;
+
+            *) ;;
+        esac
+    fi
+
     # shellcheck disable=SC2086
-    docker run \
-        --env AOC_LANG \
-        --env AOC_TAG \
-        --env AOC_YEAR \
-        --interactive \
-        ${AOC_YEAR:+--mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src"} \
-        ${AOC_YEAR:+--mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data"} \
-        ${ADDITIONAL_MOUNTS:-} \
-        --name "${CONTAINER_NAME}" \
-        --rm \
-        --tty \
-        ${ADDITIONAL_FLAGS:-} \
-        "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-        -c "bin/repl"
+    if [[ "${STATE}" == "running" ]]; then
+        docker exec \
+            --env AOC_LANG \
+            --env AOC_TAG \
+            --env AOC_YEAR \
+            --interactive \
+            --tty \
+            ${ADDITIONAL_FLAGS:-} \
+            "${CONTAINER_NAME}" "bin/repl"
+    else
+        docker run \
+            --env AOC_LANG \
+            --env AOC_TAG \
+            --env AOC_YEAR \
+            --interactive \
+            ${AOC_YEAR:+--mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src"} \
+            ${AOC_YEAR:+--mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data"} \
+            ${ADDITIONAL_MOUNTS:-} \
+            --name "${CONTAINER_NAME}" \
+            --rm \
+            --tty \
+            ${ADDITIONAL_FLAGS:-} \
+            "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+            -c "bin/repl"
+    fi
 fi
