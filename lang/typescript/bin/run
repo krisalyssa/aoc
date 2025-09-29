@@ -10,4 +10,4 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && yarn solve "${DAY}"
+cd /aoc/src && yarn day "${DAY}"

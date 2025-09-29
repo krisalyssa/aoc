@@ -1,5 +1,9 @@
 #!/bin/bash
 
+##
+## initialization which needs to take place inside the container
+##
+
 usage() {
         echo "usage: init" 2>&1
         exit 1
@@ -7,12 +11,13 @@ usage() {
 
 cd /aoc/src || exit 1
 
+## this was done in Dockerfile
 # sudo corepack enable
 corepack prepare yarn@stable --activate
 yarn init -2
 
 yarn config set enableGlobalCache false
-sed -i -r -e 's:^#(!\.yarn/cache):\1:' -e 's:^(\.pnp\.\*):#\1:' .gitignore
+# sed -i -r -e 's:^#(!\.yarn/cache):\1:' -e 's:^(\.pnp\.\*):#\1:' .gitignore
 
 jq '.name = "aoc" | .main = "index.ts" | .scripts = {day: "ts-node index.ts"}' package.json >package.json.new
 rm package.json
@@ -36,4 +41,4 @@ yarn add --dev \
 yarn add --dev --exact \
         prettier
 
-yarn dlx @yarnpkg/sdks vscode vim
+# yarn dlx @yarnpkg/sdks vscode vim

@@ -13,5 +13,6 @@ declare -x already_initialized
 if [[ -n "${AOC_YEAR}" ]]; then
         export ADDITIONAL_MOUNTS="\
 --mount type=volume,src=aoc-typescript-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
+--mount type=volume,src=aoc-typescript-${AOC_YEAR}-yarn,dst=/aoc/src/.yarn \
 "
 fi
