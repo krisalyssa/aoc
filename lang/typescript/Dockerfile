@@ -33,6 +33,7 @@ RUN \
   mkdir -p $DOCKER_APP_ROOT/src && \
   mkdir -p $DOCKER_APP_ROOT/data && \
   cd $DOCKER_APP_ROOT/src && \
+  mkdir -p $DOCKER_APP_ROOT/src/.yarn && \
   sudo corepack enable
 
 ENTRYPOINT ["/bin/bash"]
