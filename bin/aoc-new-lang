@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+##
+## set up a new language
+##
+
+usage() {
+    local exitcode=${1:-1}
+
+    echo "usage: aoc-new-lang <language>"
+    echo ""
+    echo "Sets up a new AoC language."
+
+    exit "${exitcode}"
+}
+
+while getopts ":h" opt; do
+    case ${opt} in
+        h) # help
+            usage 0
+            ;;
+
+        \?)
+            echo "invalid option -${OPTARG}" 1>&2
+            usage
+            ;;
+
+        :)
+            echo "option ${OPTARG} requires an argument" 1>&2
+            usage
+            ;;
+
+        *) ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+AOC_LANG=$1
+
+# also creates "lang/${AOC_LANG}"
+mkdir -p "lang/${AOC_LANG}/skeleton"
+
+pushd lang/.skeleton > /dev/null || exit 1
+cp .aocrc Dockerfile README.md "../${AOC_LANG}/"
+cp -R bin "../${AOC_LANG}"
+popd > /dev/null || exit 1

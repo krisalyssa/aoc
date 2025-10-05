@@ -1,0 +1,24 @@
+# code: language=shellscript insertSpaces=true tabSize=2
+# shellcheck shell=bash
+
+already_initialized() {
+        # look for a file which should exist if the year has been initialized for the language
+        if [[ -e "years/${AOC_YEAR}/{{AOC_LANG}}/README.md" ]]; then
+                return 0
+        else
+                return 1
+        fi
+}
+declare -x already_initialized
+
+if [[ -n "${AOC_YEAR}" ]]; then
+        # add any additional mounts (data and src have already been mounted)
+        #         export ADDITIONAL_MOUNTS="\
+        # --mount type=volume,src=aoc-elixir-${AOC_YEAR}-build,dst=/aoc/src/_build \
+        # --mount type=volume,src=aoc-elixir-${AOC_YEAR}-deps,dst=/aoc/src/deps \
+        # --mount type=volume,src=aoc-elixir-${AOC_YEAR}-mix,dst=/home/aoc/.mix \
+        # "
+        # if you don't have any additional mounts, this whole if can be removed
+        # but in the meantime, we need _something_ in here
+        true
+fi

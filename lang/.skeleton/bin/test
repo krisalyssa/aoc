@@ -1,0 +1,17 @@
+#!/bin/bash
+
+##
+## run solution test code for a day
+##
+
+usage() {
+        echo "usage: test" 2>&1
+        exit 1
+}
+
+DAY=$1
+[[ -z ${DAY} ]] && usage
+
+shift 1
+
+cd /aoc/src || exit 1
