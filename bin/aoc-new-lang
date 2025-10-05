@@ -40,7 +40,5 @@ AOC_LANG=$1
 # also creates "lang/${AOC_LANG}"
 mkdir -p "lang/${AOC_LANG}/skeleton"
 
-pushd lang/.skeleton > /dev/null || exit 1
-cp .aocrc Dockerfile README.md "../${AOC_LANG}/"
-cp -R bin "../${AOC_LANG}"
-popd > /dev/null || exit 1
+cp -v .skeleton/.aocrc .skeleton/Dockerfile .skeleton/README.md "lang/${AOC_LANG}/"
+cp -vR .skeleton/bin "lang/${AOC_LANG}"

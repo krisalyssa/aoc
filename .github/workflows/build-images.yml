@@ -37,8 +37,9 @@ jobs:
           dir_names: true
           dir_names_exclude_current_dir: true
           dir_names_max_depth: 1
+          files_ignore: "lang/.skeleton/**/*"
           matrix: true
-          path: 'lang/'
+          path: "lang/"
         #   since_last_remote_commit: true
 
       - name: log matrix
@@ -149,14 +150,14 @@ jobs:
           # artifactErrorsFailBuild:
           # artifacts:
           # artifactContentType:
-          body: '`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`'
+          body: "`docker pull ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version }}`"
           # bodyFile:
           # commit:
           # discussionCategory:
           draft: ${{ steps.vars.outputs.release != 'true' }}
           # generateReleaseNotes:
           # makeLatest:
-          name: '${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}'
+          name: "${{ steps.vars.outputs.name }}:${{ steps.vars.outputs.version }}"
           # omitBody:
           # omitBodyDuringUpdate:
           # omitDraftDuringUpdate:
@@ -169,7 +170,7 @@ jobs:
           # replacesArtifacts:
           # repo:
           skipIfReleaseExists: true
-          tag: '${{ steps.vars.outputs.name }}-${{ steps.vars.outputs.version }}'
+          tag: "${{ steps.vars.outputs.name }}-${{ steps.vars.outputs.version }}"
           # token:
           updateOnlyUnreleased: true
 
