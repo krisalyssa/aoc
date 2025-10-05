@@ -8,13 +8,6 @@ LABEL org.opencontainers.image.description="Elixir image for AoC"
 ENV DOCKER_APP_ROOT=/aoc
 WORKDIR ${DOCKER_APP_ROOT}
 
-# bash \
-# gcc \
-# jq \
-# make \
-# musl-dev \
-# tzdata \
-
 RUN \
   apk add --update --no-cache \
   bash \
