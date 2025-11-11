@@ -135,6 +135,16 @@ else
     for year in ${AOC_YEAR}; do
         CONTAINER_NAME="aoc-${AOC_LANG}-${year}"
 
+        [[ -d "./years/${AOC_YEAR}/${AOC_LANG}" ]] || {
+            echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
+            exit 1
+        }
+
+        [[ -d "./years/${AOC_YEAR}/data" ]] || {
+            echo "data not downloaded for ${AOC_YEAR}"
+            exit 1
+        }
+
         for day in ${AOC_DAY}; do
             # now that we're done comparing numbers, force day to two digits
             day=$(printf "%02d" "${day}")

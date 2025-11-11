@@ -148,6 +148,16 @@ else
             ${ADDITIONAL_FLAGS:-} \
             "${CONTAINER_NAME}" bin/run "${AOC_DAY}"
     else
+        [[ -d "./years/${AOC_YEAR}/${AOC_LANG}" ]] || {
+            echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
+            exit 1
+        }
+
+        [[ -d "./years/${AOC_YEAR}/data" ]] || {
+            echo "data not downloaded for ${AOC_YEAR}"
+            exit 1
+        }
+
         docker run \
             --env AOC_DAY \
             --env AOC_LANG \

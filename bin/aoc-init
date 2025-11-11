@@ -148,6 +148,16 @@ else
 
     CONTAINER_NAME="aoc-${AOC_LANG}${AOC_YEAR:+-${AOC_YEAR}}"
 
+    [[ -d "./years/${AOC_YEAR}/${AOC_LANG}" ]] || {
+        echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
+        exit 1
+    }
+
+    [[ -d "./years/${AOC_YEAR}/data" ]] || {
+        echo "data not downloaded for ${AOC_YEAR}"
+        exit 1
+    }
+
     ## now run initialization inside the container
 
     # shellcheck disable=SC2086
