@@ -118,6 +118,16 @@ else
         # echo "attaching to container"
         docker attach "${CONTAINER_NAME}"
     else
+        [[ -d "./years/${AOC_YEAR}/${AOC_LANG}" ]] || {
+            echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
+            exit 1
+        }
+
+        [[ -d "./years/${AOC_YEAR}/data" ]] || {
+            echo "data not downloaded for ${AOC_YEAR}"
+            exit 1
+        }
+
         # shellcheck disable=SC2086
         docker run \
             ${DETACH:+--detach} \
