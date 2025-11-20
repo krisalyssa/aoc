@@ -1,5 +1,6 @@
 import { Command } from '@commander-js/extra-typings'
 import { access, constants, existsSync } from 'fs'
+import * as fs from "fs/promises"
 import * as path from 'path'
 
 const program = new Command()
@@ -48,7 +49,7 @@ if (day === undefined) {
 }
 
 const moduleName = dayModule(day!)
-access(`${moduleName}.ts`, constants.R_OK, (err) => {
+access(`${moduleName}.ts`, constants.R_OK, async (err) => {
   if (err) {
     program
       .addHelpText('beforeAll', `
@@ -61,26 +62,37 @@ ${moduleName}.ts not found
     }
 
     const dayCode = require(moduleName)
+    const data = await dayData(day!)
+    let results
 
     if (!runPart2) {
       if (verbose >= 1) {
         console.log(`running code for day ${day} part 1`)
       }
 
-      dayCode.runPart1()
+      results = [await dayCode.runPart1(data), undefined]
     } else if (!runPart1) {
       if (verbose >= 1) {
         console.log(`running code for day ${day} part 2`)
       }
 
-      dayCode.runPart2()
+      results = [undefined, await dayCode.runPart2(data)]
     } else {
       if (verbose >= 1) {
         console.log(`running code for day ${day}`)
       }
 
-      dayCode.run()
+      results = await dayCode.run(data)
     }
+
+    const fullResults = new Object()
+    Object.defineProperty(fullResults, `day_${fullDay(day!)}`, {
+      value: results,
+      writable: false,
+      enumerable: true
+    })
+
+    console.log(JSON.stringify(fullResults, null, 2))
   }
 })
 
@@ -93,8 +105,18 @@ function appDir() {
 }
 
 function dayModule(day: number, rootDir = appDir()) {
-  const dayWithLeadingZeros = String(day).padStart(2, '0')
+  const dayWithLeadingZeros = fullDay(day)
   return path.join(rootDir, 'days', dayWithLeadingZeros)
+}
+
+async function dayData(day: number, rootDir = appDir()) {
+  const dataRoot = path.join(rootDir, "../data")
+  const dayWithLeadingZeros = fullDay(day)
+  return fs.readFile(path.join(dataRoot, `${dayWithLeadingZeros}.txt`), "utf-8")
+}
+
+function fullDay(day: number) {
+  return String(day).padStart(2, "0")
 }
 
 function increaseVerbose(_: any, previousValue: number) {
