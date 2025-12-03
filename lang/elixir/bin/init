@@ -13,4 +13,4 @@ cd /aoc/src || exit 1
 
 mix local.hex --force
 # shellcheck disable=SC1010
-mix do deps.get, deps.compile, compile, credo, dialyzer
+mix do deps.get + deps.compile + compile + credo + dialyzer
