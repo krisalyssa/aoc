@@ -7,11 +7,9 @@
 AOC_PREFIX="$(dirname "$0")"
 
 usage() {
-    local exitcode=${1:-1}
-
     echo "usage: aoc <command> [params]"
     echo "       aoc -h"
-    exit "${exitcode}"
+    echo "       aoc commands  # for all commands"
 }
 
 while getopts ":h" opt; do
@@ -40,6 +38,17 @@ shift 1
 
 if [[ -z "${AOC_COMMAND}" ]]; then
     usage
+    exit 1
+elif [[ "${AOC_COMMAND}" == "commands" ]]; then
+    usage
+    echo "available commands:"
+
+    for c in "${AOC_PREFIX}"/aoc-*; do
+        [[ -e "${c}" ]] || break
+        echo "  ${c##"${AOC_PREFIX}"/aoc-}"
+    done
+
+    exit 1
 else
     SCRIPT_FILENAME="${AOC_PREFIX}/aoc-${AOC_COMMAND}"
     if [[ ! -x "${SCRIPT_FILENAME}" ]]; then
