@@ -2,7 +2,10 @@
 
 ##
 ## verify solutions
+## NOTE: expects jq in the path
 ##
+
+AOC_ROOT="$(dirname "$0")/.."
 
 usage() {
     local exitcode=${1:-1}
@@ -11,7 +14,7 @@ usage() {
     # shellcheck disable=SC2312
     while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
-    done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
+    done < <(find "${AOC_ROOT}/lang" -type f -name 'Dockerfile' -print0 | sort -z)
 
     echo "usage: aoc-verify -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
     echo "       aoc-verify [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>"
@@ -80,7 +83,7 @@ export AOC_DAY=
 
 if [[ -z "${AOC_LANG}" ]]; then
     usage
-elif [[ ! -d "lang/${AOC_LANG}" ]]; then
+elif [[ ! -d "${AOC_ROOT}/lang/${AOC_LANG}" ]]; then
     echo "unknown language ${AOC_LANG}"
     usage
 fi
@@ -114,8 +117,8 @@ else
     fi
 fi
 
-if [[ -x "lang/${AOC_LANG}/aoc-verify" ]]; then
-    "lang/${AOC_LANG}/aoc-verify" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
+if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-verify" ]]; then
+    "${AOC_ROOT}/lang/${AOC_LANG}/aoc-verify" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
 else
     if [[ "${AOC_YEAR}" == "all" ]]; then
         AOC_YEAR=$(seq 2015 "${CURRENT_DAY}")
@@ -130,17 +133,17 @@ else
     fi
 
     # shellcheck source=/dev/null
-    [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
+    [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]] && source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
 
     for year in ${AOC_YEAR}; do
         CONTAINER_NAME="aoc-${AOC_LANG}-${year}"
 
-        [[ -d "./years/${AOC_YEAR}/${AOC_LANG}" ]] || {
+        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/${AOC_LANG}" ]] || {
             echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
             exit 1
         }
 
-        [[ -d "./years/${AOC_YEAR}/data" ]] || {
+        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/data" ]] || {
             echo "data not downloaded for ${AOC_YEAR}"
             exit 1
         }
@@ -157,8 +160,8 @@ else
                     --env AOC_TAG \
                     --env AOC_YEAR \
                     --interactive \
-                    --mount "type=bind,src=./years/${year}/${AOC_LANG},dst=/aoc/src" \
-                    --mount "type=bind,src=./years/${year}/data,dst=/aoc/data" \
+                    --mount "type=bind,src=${AOC_ROOT}/years/${year}/${AOC_LANG},dst=/aoc/src" \
+                    --mount "type=bind,src=${AOC_ROOT}/years/${year}/data,dst=/aoc/data" \
                     ${ADDITIONAL_MOUNTS:-} \
                     --name "${CONTAINER_NAME}" \
                     --rm \
@@ -169,13 +172,13 @@ else
             )
 
             part_1=$(echo "${OUTPUT}" | jq -r ".day_${day}[0]")
-            solution_1=$(jq -r ".day_${day}[0]" "years/${year}/solutions.json")
+            solution_1=$(jq -r ".day_${day}[0]" "${AOC_ROOT}/years/${year}/solutions.json")
             if [[ "${solution_1}" != "null" && "${part_1}" != "${solution_1}" ]]; then
                 echo "${year}-${day} part 1: ${part_1} should be ${solution_1}"
             fi
 
             part_2=$(echo "${OUTPUT}" | jq -r ".day_${day}[1]")
-            solution_2=$(jq -r ".day_${day}[1]" "years/${year}/solutions.json")
+            solution_2=$(jq -r ".day_${day}[1]" "${AOC_ROOT}/years/${year}/solutions.json")
             if [[ "${solution_2}" != "null" && "${part_2}" != "${solution_2}" ]]; then
                 echo "${year}-${day} part 2: ${part_2} should be ${solution_2}"
             fi

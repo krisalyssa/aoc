@@ -4,6 +4,8 @@
 ## pull data
 ##
 
+AOC_ROOT="$(dirname "$0")/.."
+
 usage() {
     local exitcode=${1:-1}
 
@@ -114,7 +116,7 @@ fi
 
 data_filename() {
     local year=$1 day=$2
-    printf "years/%s/data/%02d.txt" "${year}" "${day}"
+    printf "${AOC_ROOT}/years/%s/data/%02d.txt" "${year}" "${day}"
 }
 
 data_url() {

@@ -4,6 +4,8 @@
 ## set up a new language
 ##
 
+AOC_ROOT="$(dirname "$0")/.."
+
 usage() {
     local exitcode=${1:-1}
 
@@ -38,7 +40,7 @@ shift $((OPTIND - 1))
 AOC_LANG=$1
 
 # also creates "lang/${AOC_LANG}"
-mkdir -p "lang/${AOC_LANG}/skeleton"
+mkdir -p "${AOC_ROOT}/lang/${AOC_LANG}/skeleton"
 
-cp -v .skeleton/.aocrc .skeleton/Dockerfile .skeleton/README.md "lang/${AOC_LANG}/"
-cp -vR .skeleton/bin "lang/${AOC_LANG}"
+cp -v "${AOC_ROOT}/.skeleton/.aocrc" "${AOC_ROOT}/.skeleton/Dockerfile" "${AOC_ROOT}/.skeleton/README.md" "${AOC_ROOT}/lang/${AOC_LANG}/"
+cp -vR "${AOC_ROOT}/.skeleton/bin" "${AOC_ROOT}/lang/${AOC_LANG}"
