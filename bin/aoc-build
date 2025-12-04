@@ -4,6 +4,8 @@
 ## build an image for a language for local testing
 ##
 
+AOC_ROOT="$(dirname "$0")/.."
+
 usage() {
     local exitcode=${1:-1}
 
@@ -11,7 +13,7 @@ usage() {
     # shellcheck disable=SC2312
     while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
-    done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
+    done < <(find "${AOC_ROOT}/lang" -type f -name 'Dockerfile' -print0 | sort -z)
 
     echo "usage: aoc-build -l <language> [ -t <tag> ]"
     echo "       aoc-build [ -t <tag> ] <language>"
@@ -61,24 +63,24 @@ AOC_TAG=${AOC_TAG:-local}
 
 [[ -z "${AOC_LANG}" ]] && usage
 
-if [[ -d "lang/${AOC_LANG}" ]]; then
-    if [[ -x "lang/${AOC_LANG}/aoc-build" ]]; then
-        "lang/${AOC_LANG}/aoc-build" "$@"
-    elif [[ ! -r "lang/${AOC_LANG}/Dockerfile" ]]; then
+if [[ -d "${AOC_ROOT}/lang/${AOC_LANG}" ]]; then
+    if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-build" ]]; then
+        "${AOC_ROOT}/lang/${AOC_LANG}/aoc-build" "$@"
+    elif [[ ! -r "${AOC_ROOT}/lang/${AOC_LANG}/Dockerfile" ]]; then
         echo "no Dockerfile for language ${AOC_LANG}"
         exit 1
     else
         # shellcheck source=/dev/null
-        if [[ -r "lang/${AOC_LANG}/.aocrc" ]]; then
-            source "lang/${AOC_LANG}/.aocrc"
+        if [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]]; then
+            source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
         fi
 
         # shellcheck disable=SC2086
         docker build \
-            --file "lang/${AOC_LANG}/Dockerfile" \
+            --file "${AOC_ROOT}/lang/${AOC_LANG}/Dockerfile" \
             --tag "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
             ${ADDITIONAL_FLAGS:-} \
-            "lang/${AOC_LANG}"
+            "${AOC_ROOT}/lang/${AOC_LANG}"
     fi
 else
     echo "unknown language '${AOC_LANG}'"

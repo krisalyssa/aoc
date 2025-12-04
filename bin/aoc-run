@@ -5,6 +5,8 @@
 ## if there is a container already running, use it?
 ##
 
+AOC_ROOT="$(dirname "${0}")/.."
+
 usage() {
     local exitcode=${1:-1}
 
@@ -81,8 +83,9 @@ export AOC_DAY=${AOC_DAY:-${CURRENT_DAY}}
 
 if [[ -z "${AOC_LANG}" ]]; then
     usage
-elif [[ ! -d "lang/${AOC_LANG}" ]]; then
+elif [[ ! -d "${AOC_ROOT}/lang/${AOC_LANG}" ]]; then
     echo "unknown language ${AOC_LANG}"
+    echo "${AOC_ROOT}/lang/${AOC_LANG} not found or isn't a directory"
     usage
 fi
 
@@ -108,11 +111,11 @@ else
     fi
 fi
 
-if [[ -x "lang/${AOC_LANG}/aoc-run" ]]; then
-    "lang/${AOC_LANG}/aoc-run" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
+if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-run" ]]; then
+    "${AOC_ROOT}/lang/${AOC_LANG}/aoc-run" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
 else
     # shellcheck source=/dev/null
-    [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
+    [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]] && source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
 
     CONTAINER_NAME="aoc-${AOC_LANG}-${AOC_YEAR}"
 

@@ -4,7 +4,7 @@
 ## main command for aoc
 ##
 
-AOC_PREFIX="$(dirname "$0")"
+AOC_ROOT="$(dirname "$0")/.."
 
 usage() {
     echo "usage: aoc <command> [params]"
@@ -43,14 +43,14 @@ elif [[ "${AOC_COMMAND}" == "commands" ]]; then
     usage
     echo "available commands:"
 
-    for c in "${AOC_PREFIX}"/aoc-*; do
+    for c in "${AOC_ROOT}"/bin/aoc-*; do
         [[ -e "${c}" ]] || break
-        echo "  ${c##"${AOC_PREFIX}"/aoc-}"
+        echo "  ${c##"${AOC_ROOT}"/bin/aoc-}"
     done
 
     exit 1
 else
-    SCRIPT_FILENAME="${AOC_PREFIX}/aoc-${AOC_COMMAND}"
+    SCRIPT_FILENAME="${AOC_ROOT}/bin/aoc-${AOC_COMMAND}"
     if [[ ! -x "${SCRIPT_FILENAME}" ]]; then
         echo "unknown command '${AOC_COMMAND}'"
         usage

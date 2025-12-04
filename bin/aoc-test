@@ -4,6 +4,8 @@
 ## run tests
 ##
 
+AOC_ROOT="$(dirname "$0")/.."
+
 usage() {
     local exitcode=${1:-1}
 
@@ -11,7 +13,7 @@ usage() {
     # shellcheck disable=SC2312
     while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
-    done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
+    done < <(find "${AOC_ROOT}/lang" -type f -name 'Dockerfile' -print0 | sort -z)
 
     echo "usage: aoc-test -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
     echo "       aoc-test [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>"
@@ -80,7 +82,7 @@ export AOC_DAY=${AOC_DAY:-${CURRENT_DAY}}
 
 if [[ -z "${AOC_LANG}" ]]; then
     usage
-elif [[ ! -d "lang/${AOC_LANG}" ]]; then
+elif [[ ! -d "${AOC_ROOT}/lang/${AOC_LANG}" ]]; then
     echo "unknown language ${AOC_LANG}"
     usage
 fi
@@ -107,11 +109,11 @@ else
     fi
 fi
 
-if [[ -x "lang/${AOC_LANG}/aoc-test" ]]; then
-    "lang/${AOC_LANG}/aoc-test" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
+if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-test" ]]; then
+    "${AOC_ROOT}/lang/${AOC_LANG}/aoc-test" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
 else
     # shellcheck source=/dev/null
-    [[ -r "lang/${AOC_LANG}/.aocrc" ]] && source "lang/${AOC_LANG}/.aocrc"
+    [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]] && source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
 
     CONTAINER_NAME="aoc-${AOC_LANG}-${AOC_YEAR}"
 
@@ -147,12 +149,12 @@ else
             ${ADDITIONAL_FLAGS:-} \
             "${CONTAINER_NAME}" bin/test "${AOC_DAY}"
     else
-        [[ -d "./years/${AOC_YEAR}/${AOC_LANG}" ]] || {
+        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/${AOC_LANG}" ]] || {
             echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
             exit 1
         }
 
-        [[ -d "./years/${AOC_YEAR}/data" ]] || {
+        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/data" ]] || {
             echo "data not downloaded for ${AOC_YEAR}"
             exit 1
         }
@@ -163,8 +165,8 @@ else
             --env AOC_TAG \
             --env AOC_YEAR \
             --interactive \
-            --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
-            --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
+            --mount "type=bind,src=${AOC_ROOT}/years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
+            --mount "type=bind,src=${AOC_ROOT}/years/${AOC_YEAR}/data,dst=/aoc/data" \
             ${ADDITIONAL_MOUNTS:-} \
             --name "${CONTAINER_NAME}" \
             --rm \
