@@ -10,4 +10,6 @@ YEAR=$1
 
 shift 1
 
-cd "years/${YEAR}/rust" && cargo test
+cd /aoc/src || exit 1
+
+yarn test
