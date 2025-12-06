@@ -13,6 +13,7 @@ declare -x already_initialized
 if [[ -n "${AOC_YEAR}" ]]; then
         export ADDITIONAL_MOUNTS="\
 --mount type=volume,src=aoc-elixir-${AOC_YEAR}-build,dst=/aoc/src/_build \
+--mount type=volume,src=aoc-elixir-${AOC_YEAR}-cache,dst=/home/aoc/.cache \
 --mount type=volume,src=aoc-elixir-${AOC_YEAR}-deps,dst=/aoc/src/deps \
 --mount type=volume,src=aoc-elixir-${AOC_YEAR}-mix,dst=/home/aoc/.mix \
 "

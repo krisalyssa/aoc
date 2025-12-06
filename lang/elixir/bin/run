@@ -1,8 +1,8 @@
 #!/bin/bash
 
 usage() {
-  echo "usage: run DAY" 2>&1
-  exit 1
+        echo "usage: run DAY" 2>&1
+        exit 1
 }
 
 DAY=$1
@@ -10,4 +10,9 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && mix run -e "AoC.Day${DAY}.run()"
+cd /aoc/src || exit 1
+
+# NOTE: this directory depends on the Elixir and Erlang versions in the image!
+[[ ! -d /home/aoc/.mix/archives/hex-2.3.1-otp-28 ]] && mix local.hex --force
+
+mix run -e "AoC.Day${DAY}.run()"
