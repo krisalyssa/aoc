@@ -10,4 +10,6 @@ DAY=$1
 
 shift 1
 
-cd /aoc/src && yarn day "${DAY}"
+cd /aoc/src || exit 1
+
+yarn day "${DAY}"

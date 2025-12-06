@@ -5,4 +5,6 @@ usage() {
         exit 1
 }
 
-cd /aoc/src && node
+cd /aoc/src || exit 1
+
+node
