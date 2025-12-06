@@ -1,6 +1,7 @@
 (ns day-01
   (:gen-class))
 
+(require '[clojure.data.json :as json])
 (require '[clojure.string :as str])
 
 ;; (defn read-file-as-one-string
@@ -21,5 +22,4 @@
   0)
 
 (defn -main []
-  (printf "day 01 part 1: %d%n" (part1 (read-file-as-string-list "../data/01.txt")))
-  (printf "day 01 part 2: %d%n" (part2 (read-file-as-string-list "../data/01.txt"))))
+  (printf "%s%n" (json/write-str {:day_01 [(part1 (read-file-as-string-list "../data/01.txt")) (part2 (read-file-as-string-list "../data/01.txt"))]} :indent true)))
