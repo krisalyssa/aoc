@@ -11,6 +11,8 @@ usage() {
 
 cd /aoc/src || exit 1
 
-mix local.hex --force
+# NOTE: this directory depends on the Elixir and Erlang versions in the image!
+[[ ! -d /home/aoc/.mix/archives/hex-2.3.1-otp-28 ]] && mix local.hex --force
+
 # shellcheck disable=SC1010
 mix do deps.get + deps.compile + compile + credo + dialyzer

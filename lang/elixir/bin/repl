@@ -1,8 +1,13 @@
 #!/bin/bash
 
 usage() {
-  echo "usage: repl" 2>&1
-  exit 1
+        echo "usage: repl" 2>&1
+        exit 1
 }
 
-cd /aoc/src && iex -S mix
+cd /aoc/src || exit 1
+
+# NOTE: this directory depends on the Elixir and Erlang versions in the image!
+[[ ! -d /home/aoc/.mix/archives/hex-2.3.1-otp-28 ]] && mix local.hex --force
+
+iex --erl "-kernel shell_history enabled" -S mix

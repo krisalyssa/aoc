@@ -1,7 +1,7 @@
 FROM elixir:1.19.4-otp-28-alpine AS base
 
 LABEL lang="elixir"
-LABEL version="1.19.4-1"
+LABEL version="1.19.4-2"
 LABEL org.opencontainers.image.source="https://github.com/krisalyssa/aoc"
 LABEL org.opencontainers.image.description="Elixir image for AoC"
 
@@ -30,6 +30,7 @@ RUN \
   mkdir -p ${DOCKER_APP_ROOT}/data && \
   mkdir -p ${DOCKER_APP_ROOT}/src/_build && \
   mkdir -p ${DOCKER_APP_ROOT}/src/deps && \
+  mkdir -p /home/aoc/.cache && \
   mkdir -p /home/aoc/.mix
 
 ENTRYPOINT ["/bin/bash"]
