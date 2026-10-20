@@ -4,7 +4,9 @@
 ## run tests
 ##
 
+AOC_DRY_RUN=
 AOC_ROOT="$(dirname "$0")/.."
+AOC_VERBOSE=
 
 usage() {
     local exitcode=${1:-1}
@@ -25,6 +27,9 @@ usage() {
     echo "* -y -- year (defaults to current year)"
     echo "* -d -- day (defaults to current day)"
     echo "* -t -- tag for language Docker image (defaults to 'latest')"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
 
@@ -34,7 +39,7 @@ usage() {
 while getopts ":d:hl:t:y:" opt; do
     case ${opt} in
         d) # day
-            AOC_DAY=${OPTARG}
+            export AOC_DAY=${OPTARG}
             ;;
 
         h) # help
@@ -42,11 +47,19 @@ while getopts ":d:hl:t:y:" opt; do
             ;;
 
         l) # lang
-            AOC_LANG=${OPTARG}
+            export AOC_LANG=${OPTARG}
+            ;;
+
+        n) # dry run
+            export AOC_DRY_RUN=1
             ;;
 
         t) # tag for lang image
-            AOC_TAG=${OPTARG}
+            export AOC_TAG=${OPTARG}
+            ;;
+
+        v) # verbose
+            export AOC_VERBOSE=1
             ;;
 
         y) # year
