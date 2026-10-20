@@ -48,7 +48,7 @@ read -rsp "Now that the session token value is on the clipboard, paste it here w
 echo
 
 # check that the value in token is valid, as best we can (only 0-9 and a-f, 128 characters?)
-token_length=$(echo -n "${token}" | wc -c)
+token_length=$(echo -n "${token}" | wc -c | xargs)
 if [[ "${token_length}" == "128" ]]; then
     if echo "${token}" | grep -E -v '[^0-9a-f]' > /dev/null; then
         echo "${token}" > ./.token
