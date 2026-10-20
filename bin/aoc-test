@@ -17,8 +17,8 @@ usage() {
         langs+=("$(basename "$(dirname "${filename}")")")
     done < <(find "${AOC_ROOT}/lang" -type f -name 'Dockerfile' -print0 | sort -z)
 
-    echo "usage: aoc-test -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
-    echo "       aoc-test [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>"
+    echo "usage: aoc-test -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ] [ -n ] [ -v ]"
+    echo "       aoc-test [ -y <year> ] [ -d <day> ] [ -t <tag> ] [ -n ] [ -v ]<language>"
     echo ""
     echo "Runs tests for a year, day, and language."
     echo ""
@@ -36,7 +36,10 @@ usage() {
     exit "${exitcode}"
 }
 
-while getopts ":d:hl:t:y:" opt; do
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
+
+while getopts ":d:hl:nt:vy:" opt; do
     case ${opt} in
         d) # day
             export AOC_DAY=${OPTARG}
@@ -63,7 +66,7 @@ while getopts ":d:hl:t:y:" opt; do
             ;;
 
         y) # year
-            AOC_YEAR=${OPTARG}
+            export AOC_YEAR=${OPTARG}
             ;;
 
         \?)
@@ -122,70 +125,35 @@ else
     fi
 fi
 
+[[ -d "${AOC_ROOT}/years/${AOC_YEAR}/${AOC_LANG}" ]] || {
+    echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
+    exit 1
+}
+
+[[ -d "${AOC_ROOT}/years/${AOC_YEAR}/data" ]] || {
+    echo "data not downloaded for ${AOC_YEAR}"
+    exit 1
+}
+
 if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-test" ]]; then
     "${AOC_ROOT}/lang/${AOC_LANG}/aoc-test" -y "${AOC_YEAR}" -d "${AOC_DAY}" -t "${AOC_TAG}"
 else
-    # shellcheck source=/dev/null
+    # shellcheck disable=SC1090
     [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]] && source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
-
-    CONTAINER_NAME="aoc-${AOC_LANG}-${AOC_YEAR}"
 
     # now that we're done comparing numbers, force day to two digits
     AOC_DAY=$(printf "%02d" "${AOC_DAY}")
-    STATE=
 
-    # shellcheck disable=SC2312
-    if [[ "$(docker ps --all --format json | jq -r '.Names')" == "${CONTAINER_NAME}" ]]; then
-        case $(docker ps --all --format json | jq -r --arg name "${CONTAINER_NAME}" 'select(.Names == $name) | .State') in
-            running)
-                # echo "container is already running"
-                STATE="running"
-                ;;
+    case $(container_state "${AOC_YEAR}" "${AOC_LANG}") in
+        running)
+            container_exec "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
+            ;;
 
-            exited)
-                # echo "starting container"
-                docker rm "${CONTAINER_NAME}" > /dev/null
-                ;;
+        stopped)
+            container_run "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
+            ;;
 
-            *) ;;
-        esac
-    fi
-
-    # shellcheck disable=SC2086
-    if [[ "${STATE}" == "running" ]]; then
-        docker exec \
-            --env AOC_LANG \
-            --env AOC_TAG \
-            --env AOC_YEAR \
-            --interactive \
-            --tty \
-            ${ADDITIONAL_FLAGS:-} \
-            "${CONTAINER_NAME}" bin/test "${AOC_DAY}"
-    else
-        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/${AOC_LANG}" ]] || {
-            echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
-            exit 1
-        }
-
-        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/data" ]] || {
-            echo "data not downloaded for ${AOC_YEAR}"
-            exit 1
-        }
-
-        docker run \
-            --env AOC_DAY \
-            --env AOC_LANG \
-            --env AOC_TAG \
-            --env AOC_YEAR \
-            --interactive \
-            --mount "type=bind,src=${AOC_ROOT}/years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
-            --mount "type=bind,src=${AOC_ROOT}/years/${AOC_YEAR}/data,dst=/aoc/data" \
-            ${ADDITIONAL_MOUNTS:-} \
-            --name "${CONTAINER_NAME}" \
-            --rm \
-            --tty \
-            ${ADDITIONAL_FLAGS:-} \
-            "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-            -c "bin/test ${AOC_DAY}"
-    fi
+        *)
+            ;;
+    esac
 fi
