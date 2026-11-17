@@ -3,10 +3,9 @@
 run_cmd() {
     local cmd="${1}"
 
+    [[ -n "${AOC_VERBOSE}" ]] && echo "running: ${cmd}" 1>&2
     if [[ -z "${AOC_DRY_RUN}" ]]; then
         eval "${cmd}"
-    elif [[ -n "${AOC_VERBOSE}" ]]; then
-        echo "${cmd}"
     fi
 }
 
@@ -28,7 +27,7 @@ container_name() {
 container_exec() {
     [[ -n "${AOC_VERBOSE}" ]] && echo "enter: container_exec" 1>&2
 
-    local aoc_year="${1}" aoc_lang="${2}" aoc_day="${3}" aoc_tag="${4:-latest}"
+    local aoc_script="${1}" aoc_year="${2}" aoc_lang="${3}" aoc_day="${4}" aoc_tag="${5:-latest}"
     local container_name cmd
 
     container_name=$(container_name "${aoc_year}" "${aoc_lang}")
@@ -43,7 +42,7 @@ container exec \
     --interactive \
     --tty \
     ${ADDITIONAL_FLAGS:-} \
-    "${container_name}" bin/test "${aoc_day}"
+    "${container_name}" "bin/${aoc_script}" "${aoc_day}"
 EOF
         )
     elif command -v docker > /dev/null 2>&1; then
@@ -56,7 +55,7 @@ docker exec \
     --interactive \
     --tty \
     ${ADDITIONAL_FLAGS:-} \
-    "${container_name}" bin/test "${aoc_day}"
+    "${container_name}" "bin/${aoc_script}" "${aoc_day}"
 EOF
         )
     else
@@ -72,7 +71,7 @@ EOF
 container_run() {
     [[ -n "${AOC_VERBOSE}" ]] && echo "enter: container_run" 1>&2
 
-    local aoc_year="${1}" aoc_lang="${2}" aoc_day="${3}" aoc_tag="${4:-latest}"
+    local aoc_script="${1}" aoc_year="${2}" aoc_lang="${3}" aoc_day="${4}" aoc_tag="${5:-latest}"
     local container_name cmd
 
     container_name=$(container_name "${aoc_year}" "${aoc_lang}")
@@ -94,7 +93,7 @@ container exec \
     --interactive \
     --tty \
     ${ADDITIONAL_FLAGS:-} \
-    "${container_name}" bin/test "${aoc_day}"
+    "${container_name}" "bin/${aoc_script}" "${aoc_day}"
 EOF
         )
         run_cmd "${cmd}"
@@ -116,7 +115,7 @@ docker run \
     --tty \
     ${ADDITIONAL_FLAGS:-} \
     "ghcr.io/krisalyssa/aoc/aoc-${aoc_lang}:${aoc_tag}" \
-    -c "bin/test ${aoc_day}"
+    -c "bin/${aoc_script} ${aoc_day}"
 EOF
         )
         run_cmd "${cmd}"
