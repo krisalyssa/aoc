@@ -239,7 +239,8 @@ cat $HOME/.github/krisalyssa.token | docker login -u krisalyssa --password-stdin
 ## UNIT TESTS
 
 Unit tests are available in the `test/` directory. These tests verify:
+
 - Script existence and permissions
 - Syntax validation
-- Core functionality of utility functions
+- Core functionality of utility functions including `run_cmd`
 - Argument parsing and validation logic

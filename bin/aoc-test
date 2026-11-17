@@ -146,11 +146,11 @@ else
 
     case $(container_state "${AOC_YEAR}" "${AOC_LANG}") in
         running)
-            container_exec "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
+            container_exec test "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
             ;;
 
         stopped)
-            container_run "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
+            container_run test "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
             ;;
 
         *)
