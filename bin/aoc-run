@@ -7,6 +7,9 @@
 
 AOC_ROOT="$(dirname "${0}")/.."
 
+# Source the shared utilities
+source "${AOC_ROOT}/bin/utils.sh"
+
 usage() {
     local exitcode=${1:-1}
 
@@ -14,7 +17,7 @@ usage() {
     # shellcheck disable=SC2312
     while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
-    done < <(find lang -type f -name 'Dockerfile' -print0 | sort -z)
+    done < <(find "${AOC_ROOT}/lang" -type f -name 'Dockerfile' -print0 | sort -z)
 
     echo "usage: aoc-run -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
     echo "       aoc-run [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>"
@@ -41,7 +44,6 @@ while getopts ":d:hl:t:y:" opt; do
         h) # help
             usage 0
             ;;
-
         l) # lang
             AOC_LANG=${OPTARG}
             ;;
@@ -58,23 +60,17 @@ while getopts ":d:hl:t:y:" opt; do
             echo "invalid option -${OPTARG}" 1>&2
             usage
             ;;
-
         :)
             echo "option ${OPTARG} requires an argument" 1>&2
             usage
             ;;
-
         *) ;;
     esac
 done
 shift $((OPTIND - 1))
 
-# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
-# shellcheck disable=SC2312
-CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
-# for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
-# shellcheck disable=SC2312
-CURRENT_DAY=$(date -I | cut -d '-' -f 3)
+CURRENT_YEAR=$(get_current_year)
+CURRENT_DAY=$(get_current_day)
 
 export AOC_LANG=${AOC_LANG:-$1}
 export AOC_TAG=${AOC_TAG:-latest}
@@ -91,22 +87,14 @@ fi
 
 if [[ -z "${AOC_YEAR}" ]]; then
     usage
-elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
-    echo "year out of range"
+elif ! validate_year "${AOC_YEAR}"; then
     usage
 fi
 
 if [[ -z "${AOC_DAY}" ]]; then
     usage
 else
-    # strip leading zero, if any, for proper numeric comparisons
-    [[ -n "${AOC_DAY}" ]] && AOC_DAY=$((AOC_DAY + 0))
-
-    if ((AOC_DAY < 1 || AOC_DAY > 25)); then
-        echo "day out of range"
-        usage
-    elif ((AOC_YEAR == CURRENT_YEAR && AOC_DAY > CURRENT_DAY)); then
-        echo "day ${AOC_DAY} hasn't been released yet"
+    if ! validate_day "${AOC_DAY}" "${AOC_YEAR}"; then
         usage
     fi
 fi
@@ -121,35 +109,12 @@ else
 
     # now that we're done comparing numbers, force day to two digits
     AOC_DAY=$(printf "%02d" "${AOC_DAY}")
-    STATE=
 
-    # shellcheck disable=SC2312
-    if [[ "$(docker ps --all --format json | jq -r '.Names')" == "${CONTAINER_NAME}" ]]; then
-        case $(docker ps --all --format json | jq -r --arg name "${CONTAINER_NAME}" 'select(.Names == $name) | .State') in
-            running)
-                # echo "container is already running"
-                STATE="running"
-                ;;
-
-            exited)
-                # echo "starting container"
-                docker rm "${CONTAINER_NAME}" > /dev/null
-                ;;
-
-            *) ;;
-        esac
-    fi
+    STATE=$(container_state "${AOC_YEAR}" "${AOC_LANG}")
 
     # shellcheck disable=SC2086
     if [[ "${STATE}" == "running" ]]; then
-        docker exec \
-            --env AOC_LANG \
-            --env AOC_TAG \
-            --env AOC_YEAR \
-            --interactive \
-            --tty \
-            ${ADDITIONAL_FLAGS:-} \
-            "${CONTAINER_NAME}" bin/run "${AOC_DAY}"
+        container_exec "run" "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
     else
         [[ -d "./years/${AOC_YEAR}/${AOC_LANG}" ]] || {
             echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
@@ -161,20 +126,6 @@ else
             exit 1
         }
 
-        docker run \
-            --env AOC_DAY \
-            --env AOC_LANG \
-            --env AOC_TAG \
-            --env AOC_YEAR \
-            --interactive \
-            --mount "type=bind,src=./years/${AOC_YEAR}/${AOC_LANG},dst=/aoc/src" \
-            --mount "type=bind,src=./years/${AOC_YEAR}/data,dst=/aoc/data" \
-            ${ADDITIONAL_MOUNTS:-} \
-            --name "${CONTAINER_NAME}" \
-            --rm \
-            --tty \
-            ${ADDITIONAL_FLAGS:-} \
-            "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-            -c "bin/run ${AOC_DAY}"
+        container_run "run" "${AOC_YEAR}" "${AOC_LANG}" "${AOC_DAY}" "${AOC_TAG}"
     fi
 fi

@@ -13,6 +13,15 @@ else
     echo "  utils.sh test file not found"
 fi
 
+# Test validation functions in utils.sh
+echo "Testing utils validation functions..."
+if [[ -f "./test-utils-validation.sh" ]]; then
+    echo "  Running utils validation tests..."
+    bash ./test/test-utils-validation.sh
+else
+    echo "  utils validation test file not found"
+fi
+
 # Test aoc-test script
 echo "Testing aoc-test..."
 if [[ -f "./test-aoc-test.sh" ]]; then
