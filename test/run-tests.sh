@@ -6,20 +6,11 @@ echo "Running unit tests for shell scripts..."
 
 # Test utils.sh functions
 echo "Testing utils.sh..."
-if [[ -f "./test-utils.sh" ]]; then
+if [[ -f "./test/test-utils.sh" ]]; then
     echo "  Running utils.sh tests..."
     bash ./test/test-utils.sh
 else
-    echo "  utils.sh test file not found"
-fi
-
-# Test validation functions in utils.sh
-echo "Testing utils validation functions..."
-if [[ -f "./test-utils-validation.sh" ]]; then
-    echo "  Running utils validation tests..."
-    bash ./test/test-utils-validation.sh
-else
-    echo "  utils validation test file not found"
+    echo "  test-utils.sh test file not found"
 fi
 
 # Test aoc-test script

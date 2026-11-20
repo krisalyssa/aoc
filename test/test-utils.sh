@@ -46,6 +46,49 @@ test_container_functions() {
     assertTrue "container_run function should exist" $(type container_run >/dev/null 2>&1; echo $?)
 }
 
+# Test get_current_year function
+test_get_current_year() {
+    local result
+    result=$(get_current_year)
+    # Should return a valid year (4 digits)
+    assertTrue "get_current_year should return a valid year" [[ ${#result} -eq 4 ]]
+    # Should be between 2015 and current year
+    assertTrue "get_current_year should be >= 2015" $((result >= 2015))
+}
+
+# Test get_current_day function
+test_get_current_day() {
+    local result
+    result=$(get_current_day)
+    # Should return a day between 1-31 (as string, but we can check if it's a number)
+    assertTrue "get_current_day should be a valid number" [[ $result =~ ^[0-9]+$ ]]
+    # Day should be reasonable (we're not checking exact date since this is a test)
+}
+
+# Test validate_year function
+test_validate_year() {
+    # Test valid years
+    assertTrue "validate_year 2015 should pass" $(validate_year 2015 > /dev/null 2>&1; echo $?)
+    assertTrue "validate_year current year should pass" $(validate_year $(get_current_year) > /dev/null 2>&1; echo $?)
+
+    # Test invalid years
+    assertFalse "validate_year 2014 should fail" $(validate_year 2014 > /dev/null 2>&1; echo $?)
+    assertFalse "validate_year 2027 should fail" $(validate_year 2027 > /dev/null 2>&1; echo $?)
+    assertFalse "validate_year empty string should fail" $(validate_year "" > /dev/null 2>&1; echo $?)
+}
+
+# Test validate_day function
+test_validate_day() {
+    # Test valid days
+    assertTrue "validate_day 1 should pass" $(validate_day 1 2023 > /dev/null 2>&1; echo $?)
+    assertTrue "validate_day 25 should pass" $(validate_day 25 2023 > /dev/null 2>&1; echo $?)
+
+    # Test invalid days
+    assertFalse "validate_day 0 should fail" $(validate_day 0 2023 > /dev/null 2>&1; echo $?)
+    assertFalse "validate_day 26 should fail" $(validate_day 26 2023 > /dev/null 2>&1; echo $?)
+    assertFalse "validate_day empty string should fail" $(validate_day "" 2023 > /dev/null 2>&1; echo $?)
+}
+
 # Run all tests if this script is executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     # Source shunit2 if available, otherwise use basic bash testing
@@ -58,6 +101,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         # Simple test runner for when shunit2 is not available
         test_run_cmd
         test_container_name
+        test_get_current_year
+        test_get_current_day
+        test_validate_year
+        test_validate_day
         echo "Basic tests completed"
     fi
 fi
