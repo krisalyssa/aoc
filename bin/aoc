@@ -4,18 +4,34 @@
 ## main command for aoc
 ##
 
+AOC_DRY_RUN=
 AOC_ROOT="$(dirname "$0")/.."
+AOC_VERBOSE=
 
 usage() {
-    echo "usage: aoc <command> [params]"
+    echo "usage: aoc [ -n ] [ -v ] <command> [params]"
     echo "       aoc -h"
     echo "       aoc commands  # for all commands"
+    echo ""
+    echo "Runs AoC commands."
+    echo ""
+    echo "Options:"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
 }
 
-while getopts ":h" opt; do
+while getopts ":hnv" opt; do
     case ${opt} in
         h) # help
             usage 0
+            ;;
+
+        n) # dry run
+            AOC_DRY_RUN=1
+            ;;
+
+        v) # verbose
+            AOC_VERBOSE=1
             ;;
 
         \?)
@@ -56,5 +72,5 @@ else
         usage
     fi
 
-    ${SCRIPT_FILENAME} "$@"
+    ${SCRIPT_FILENAME} ${AOC_DRY_RUN:+-n} ${AOC_VERBOSE:+-v} "$@"
 fi

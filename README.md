@@ -235,3 +235,12 @@ cat $HOME/.github/krisalyssa.token | docker login -u krisalyssa --password-stdin
 - [ ] `aoc-get` to fetch data
 - [ ] add `ghcr.io` authentication to any command which needs to access it
 - [ ] add support for JSON output in solution code (for `aoc verify`)
+
+## UNIT TESTS
+
+Unit tests are available in the `test/` directory. These tests verify:
+
+- Script existence and permissions
+- Syntax validation
+- Core functionality of utility functions including `run_cmd`
+- Argument parsing and validation logic
