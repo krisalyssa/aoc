@@ -154,8 +154,6 @@ else
     [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]] && source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
 
     for year in ${AOC_YEAR}; do
-        CONTAINER_NAME="aoc-${AOC_LANG}-${year}"
-
         [[ -d "${AOC_ROOT}/years/${year}/${AOC_LANG}" ]] || {
             echo "${AOC_LANG} not initialized for ${year}"
             exit 1

@@ -78,7 +78,7 @@ EOF
 container_run() {
     [[ -n "${AOC_VERBOSE}" ]] && echo "enter: container_run" 1>&2
 
-    local aoc_script="${1}" aoc_year="${2}" aoc_lang="${3}" aoc_day="${4}" aoc_tag="${5:-latest}"
+    local aoc_root="${1}" aoc_script="${2}" aoc_year="${3}" aoc_lang="${4}" aoc_day="${5}" aoc_tag="${6:-latest}"
     local container_name cmd
 
     container_name=$(container_name "${aoc_year}" "${aoc_lang}")
@@ -114,8 +114,8 @@ docker run \
     --env AOC_TAG="${aoc_tag}" \
     --env AOC_YEAR="${aoc_year}" \
     --interactive \
-    --mount "type=bind,src=${AOC_ROOT}/years/${aoc_year}/${aoc_lang},dst=/aoc/src" \
-    --mount "type=bind,src=${AOC_ROOT}/years/${aoc_year}/data,dst=/aoc/data" \
+    --mount "type=bind,src=${aoc_root}/years/${aoc_year}/${aoc_lang},dst=/aoc/src" \
+    --mount "type=bind,src=${aoc_root}/years/${aoc_year}/data,dst=/aoc/data" \
     ${ADDITIONAL_MOUNTS:-} \
     --name "${container_name}" \
     --rm \
@@ -155,7 +155,7 @@ EOF
     elif command -v docker > /dev/null 2>&1; then
         cmd=$(
             cat << EOF
-docker ps --all --format json | jq -r --arg name "${name}" 'map(select(.Names == $name)) | .[0].State'
+docker ps --all --format json | jq -r --arg name "${name}" 'map(select(.Names == \$name)) | .[0].State'
 EOF
         )
 
@@ -189,7 +189,8 @@ get_current_day() {
 # Parse and validate a year value
 validate_year() {
     local year=$1
-    local current_year=$(get_current_year)
+    local current_year
+    current_year=$(get_current_year)
 
     if [[ -z "${year}" ]]; then
         echo "Year is required"
@@ -208,8 +209,9 @@ validate_year() {
 validate_day() {
     local day=$1
     local year=$2
-    local current_year=$(get_current_year)
-    local current_day=$(get_current_day)
+    local current_year current_day
+    current_year=$(get_current_year)
+    current_day=$(get_current_day)
 
     if [[ -z "${day}" ]]; then
         echo "Day is required"
@@ -232,10 +234,14 @@ validate_day() {
 
 # Get available languages
 get_languages() {
+    local aoc_root="${1:-${AOC_ROOT}}"
+    [[ -n "${AOC_VERBOSE}" ]] && echo "enter: get_languages" 1>&2
     local langs=()
+    local find_output
+    find_output=$(find "${aoc_root}/lang" -type f -name 'Dockerfile' -print0 | sort -z || true)
     while IFS= read -r -d '' filename; do
         langs+=("$(basename "$(dirname "${filename}")")")
-    done < <(find "${AOC_ROOT}/lang" -type f -name 'Dockerfile' -print0 | sort -z)
+    done < <(echo "${find_output}")
 
     echo "${langs[@]}"
 }
