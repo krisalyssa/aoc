@@ -14,7 +14,7 @@ test_run_cmd_comprehensive() {
     AOC_DRY_RUN=
     AOC_VERBOSE=
 
-    local result1=$(run_cmd "echo 'normal test'" 2>&1)
+    result=$(run_cmd "echo 'normal test'" 2>&1)
     assertEquals "Normal execution should work without output" "" "$result1"
     echo "✓ Normal execution works correctly"
 
@@ -23,7 +23,7 @@ test_run_cmd_comprehensive() {
     AOC_DRY_RUN=1
     AOC_VERBOSE=
 
-    local result2=$(run_cmd "echo 'dry run test'" 2>&1)
+    result=$(run_cmd "echo 'dry run test'" 2>&1)
     assertEquals "Dry run should not execute commands" "" "$result2"
     echo "✓ Dry run works correctly"
 
@@ -32,7 +32,7 @@ test_run_cmd_comprehensive() {
     AOC_DRY_RUN=
     AOC_VERBOSE=1
 
-    local result3=$(run_cmd "echo 'verbose test'" 2>&1)
+    result=$(run_cmd "echo 'verbose test'" 2>&1)
     assertTrue "Verbose execution should produce output" "[[ -n \"${result3}\" ]]"
     echo "✓ Verbose execution works correctly"
 
@@ -41,7 +41,7 @@ test_run_cmd_comprehensive() {
     AOC_DRY_RUN=1
     AOC_VERBOSE=1
 
-    local result4=$(run_cmd "echo 'dry run verbose test'" 2>&1)
+    result=$(run_cmd "echo 'dry run verbose test'" 2>&1)
     assertEquals "Dry run should not execute commands even with verbose" "" "$result4"
     echo "✓ Both flags work correctly"
 
@@ -50,7 +50,7 @@ test_run_cmd_comprehensive() {
     AOC_DRY_RUN=
     AOC_VERBOSE=1
 
-    local result5=$(run_cmd "date +%Y" 2>&1)
+    result=$(run_cmd "date +%Y" 2>&1)
     assertTrue "Date command should produce output" "[[ -n \"${result5}\" ]]"
     echo "✓ Complex command execution works correctly"
 
@@ -59,7 +59,7 @@ test_run_cmd_comprehensive() {
     AOC_DRY_RUN=
     AOC_VERBOSE=
 
-    local result6=$(run_cmd "" 2>&1)
+    result=$(run_cmd "" 2>&1)
     assertEquals "Empty command should not error" "" "$result6"
     echo "✓ Empty command handled correctly"
 

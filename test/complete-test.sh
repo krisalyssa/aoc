@@ -7,7 +7,8 @@ echo "         COMPLETE TEST SUITE FOR AOC SCRIPTS"
 echo "=============================================="
 
 # Set up environment
-export AOC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+AOC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+export AOC_ROOT
 export AOC_VERBOSE=
 export AOC_DRY_RUN=
 

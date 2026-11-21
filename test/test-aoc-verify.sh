@@ -25,7 +25,7 @@ setup() {
 test_usage() {
     # This would test the usage function output
     # Since it exits, we'll just verify the function exists
-    assertTrue "usage function should exist" $(type usage >/dev/null 2>&1; echo $?)
+    assertTrue "usage function should exist" $(type usage >/dev/null 2>&1; echo $?)"
 }
 
 # Test argument parsing with getopts

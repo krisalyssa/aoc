@@ -44,7 +44,7 @@ else
         exit 1
 fi
 
-if validate_year $(get_current_year); then
+if validate_year "$(get_current_year)"; then
         echo "PASS: validate_year current year"
 else
         echo "FAIL: validate_year current year"

@@ -82,10 +82,10 @@ echo -e "\nTesting utils.sh core functionality..."
 expected_functions=("run_cmd" "container_name" "container_exec" "container_run" "container_state")
 
 for func in "${expected_functions[@]}"; do
-    if grep -q "function $func\|^[[:space:]]*$func[[:space:]]*()" "./bin/utils.sh"; then
-        echo "✓ $func function defined in utils.sh"
+    if grep -q "function ${func}\|^[[:space:]]*${func}[[:space:]]*()" "./bin/utils.sh"; then
+        echo "✓ ${func} function defined in utils.sh"
     else
-        echo "✗ $func function missing from utils.sh"
+        echo "✗ ${func} function missing from utils.sh"
     fi
 done
 

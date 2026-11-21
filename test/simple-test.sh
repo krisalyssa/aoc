@@ -62,10 +62,10 @@ fi
 echo -e "\nTest 4: Checking utils.sh functions..."
 functions_to_check=("run_cmd" "container_name" "container_exec" "container_run" "container_state")
 for func in "${functions_to_check[@]}"; do
-    if grep -q "function $func\|^[[:space:]]*$func[[:space:]]*()" "./bin/utils.sh"; then
-        echo "✓ $func function exists"
+    if grep -q "function ${func}\|^[[:space:]]*${func}[[:space:]]*()" "./bin/utils.sh"; then
+        echo "✓ ${func} function exists"
     else
-        echo "✗ $func function missing"
+        echo "✗ ${func} function missing"
     fi
 done
 

@@ -29,23 +29,23 @@ test_all_permutations() {
     AOC_VERBOSE=
 
     # This should execute the command but not produce verbose output
-    local result1=$(run_cmd "echo 'test1'" 2>&1)
-    assertEquals "Normal execution should work" "" "$result1"
+    result=$(run_cmd "echo 'test1'" 2>&1)
+    assertEquals "Normal execution should work" "" ""
 
     # Test 2: Dry run, no verbose
     echo "Test 2: Dry run only (AOC_DRY_RUN=1, AOC_VERBOSE=)"
     AOC_DRY_RUN=1
     AOC_VERBOSE=
 
-    local result2=$(run_cmd "echo 'test2'" 2>&1)
-    assertEquals "Dry run should not execute commands" "" "$result2"
+    result=$(run_cmd "echo 'test2'" 2>&1)
+    assertEquals "Dry run should not execute commands" "" ""
 
     # Test 3: No dry run, verbose
     echo "Test 3: Verbose only (AOC_DRY_RUN=, AOC_VERBOSE=1)"
     AOC_DRY_RUN=
     AOC_VERBOSE=1
 
-    local result3=$(run_cmd "echo 'test3'" 2>&1)
+    result=$(run_cmd "echo 'test3'" 2>&1)
     # Should produce output because we're in verbose mode
     assertTrue "Verbose execution should produce output" "[[ -n \"${result3}\" ]]"
 
@@ -54,8 +54,8 @@ test_all_permutations() {
     AOC_DRY_RUN=1
     AOC_VERBOSE=1
 
-    local result4=$(run_cmd "echo 'test4'" 2>&1)
-    assertEquals "Dry run should not execute commands even with verbose" "" "$result4"
+    result=$(run_cmd "echo 'test4'" 2>&1)
+    assertEquals "Dry run should not execute commands even with verbose" "" ""
 
     echo "All permutation tests passed!"
 }
@@ -69,12 +69,12 @@ test_command_execution() {
     AOC_VERBOSE=
 
     # Test simple echo
-    local echo_result=$(run_cmd "echo 'hello world'" 2>&1)
+    local result=$(run_cmd "echo 'hello world'" 2>&1)
     assertEquals "Echo should work" "" "$echo_result"
 
     # Test command that produces output (should be captured in verbose mode)
     AOC_VERBOSE=1
-    local date_result=$(run_cmd "date +%Y" 2>&1)
+    local result=$(run_cmd "date +%Y" 2>&1)
     assertTrue "Date command should produce year" "[[ -n \"${date_result}\" ]]"
 
     echo "Command execution tests passed!"
@@ -87,13 +87,13 @@ test_edge_cases() {
     # Test with empty command
     AOC_DRY_RUN=
     AOC_VERBOSE=
-    local empty_result=$(run_cmd "" 2>&1)
+    local result=$(run_cmd "" 2>&1)
     assertEquals "Empty command should not error" "" "$empty_result"
 
     # Test with complex command
     AOC_DRY_RUN=
     AOC_VERBOSE=1
-    local complex_result=$(run_cmd "ls -la | wc -l" 2>&1)
+    local result=$(run_cmd "ls -la | wc -l" 2>&1)
     assertTrue "Complex command should execute" "[[ -n \"${complex_result}\" ]]"
 
     echo "Edge case tests passed!"
@@ -106,13 +106,13 @@ test_command_types() {
     # Test with variable assignment
     AOC_DRY_RUN=
     AOC_VERBOSE=1
-    local var_result=$(run_cmd "VAR=test; echo \$VAR" 2>&1)
+    local result=$(run_cmd "VAR=test; echo \$VAR" 2>&1)
     assertTrue "Variable assignment should work" "[[ -n \"${var_result}\" ]]"
 
     # Test with multiple commands
     AOC_DRY_RUN=
     AOC_VERBOSE=1
-    local multi_result=$(run_cmd "echo 'first'; echo 'second'" 2>&1)
+    local result=$(run_cmd "echo 'first'; echo 'second'" 2>&1)
     assertTrue "Multiple commands should execute" "[[ -n \"${multi_result}\" ]]"
 
     echo "Command types tests passed!"

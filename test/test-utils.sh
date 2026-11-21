@@ -1,10 +1,11 @@
+#!/bin/bash
 # Test validate_year function
 test_validate_year() {
     # Test valid years
     validate_year 2015 > /dev/null 2>&1
     assertTrue "validate_year 2015 should pass" $?
 
-    validate_year $(get_current_year) > /dev/null 2>&1
+    validate_year "$(get_current_year)" > /dev/null 2>&1
     assertTrue "validate_year current year should pass" $?
 
     # Test invalid years
