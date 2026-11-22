@@ -8,6 +8,7 @@
 AOC_ROOT="$(dirname "${0}")/.."
 
 # Source the shared utilities
+# shellcheck disable=SC1091
 source "${AOC_ROOT}/bin/utils.sh"
 
 usage() {
@@ -104,8 +105,6 @@ if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-run" ]]; then
 else
     # shellcheck source=/dev/null
     [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]] && source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
-
-    CONTAINER_NAME="aoc-${AOC_LANG}-${AOC_YEAR}"
 
     # now that we're done comparing numbers, force day to two digits
     AOC_DAY=$(printf "%02d" "${AOC_DAY}")

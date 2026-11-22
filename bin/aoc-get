@@ -7,6 +7,7 @@
 AOC_ROOT="$(dirname "$0")/.."
 
 # Source the shared utilities
+# shellcheck disable=SC1091
 source "${AOC_ROOT}/bin/utils.sh"
 
 usage() {
