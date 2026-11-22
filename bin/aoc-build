@@ -4,7 +4,9 @@
 ## build an image for a language for local testing
 ##
 
+AOC_DRY_RUN=
 AOC_ROOT="$(dirname "$0")/.."
+AOC_VERBOSE=
 
 usage() {
     local exitcode=${1:-1}
@@ -23,24 +25,38 @@ usage() {
     echo "Options:"
     echo "* -l -- language"
     echo "* -t -- tag for language Docker image (defaults to 'local')"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
 
     exit "${exitcode}"
 }
 
-while getopts ":hl:t:" opt; do
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
+
+while getopts ":hl:t:nv" opt; do
     case ${opt} in
         h) # help
             usage 0
             ;;
 
         l) # lang
-            AOC_LANG=${OPTARG}
+            export AOC_LANG=${OPTARG}
             ;;
 
         t) # tag for lang image
-            AOC_TAG=${OPTARG}
+            export AOC_TAG=${OPTARG}
+            ;;
+
+        n) # dry run
+            export AOC_DRY_RUN=1
+            ;;
+
+        v) # verbose
+            export AOC_VERBOSE=1
             ;;
 
         \?)
@@ -58,31 +74,31 @@ while getopts ":hl:t:" opt; do
 done
 shift $((OPTIND - 1))
 
-AOC_LANG=${AOC_LANG:-$1}
-AOC_TAG=${AOC_TAG:-local}
+export AOC_LANG=${AOC_LANG:-$1}
+export AOC_TAG=${AOC_TAG:-local}
 
-[[ -z "${AOC_LANG}" ]] && usage
+if [[ -z "${AOC_LANG}" ]]; then
+    usage
+elif [[ ! -d "${AOC_ROOT}/lang/${AOC_LANG}" ]]; then
+    echo "unknown language ${AOC_LANG}"
+    usage
+fi
 
-if [[ -d "${AOC_ROOT}/lang/${AOC_LANG}" ]]; then
-    if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-build" ]]; then
-        "${AOC_ROOT}/lang/${AOC_LANG}/aoc-build" "$@"
-    elif [[ ! -r "${AOC_ROOT}/lang/${AOC_LANG}/Dockerfile" ]]; then
-        echo "no Dockerfile for language ${AOC_LANG}"
-        exit 1
-    else
-        # shellcheck source=/dev/null
-        if [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]]; then
-            source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
-        fi
-
-        # shellcheck disable=SC2086
-        docker build \
-            --file "${AOC_ROOT}/lang/${AOC_LANG}/Dockerfile" \
-            --tag "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-            ${ADDITIONAL_FLAGS:-} \
-            "${AOC_ROOT}/lang/${AOC_LANG}"
-    fi
-else
-    echo "unknown language '${AOC_LANG}'"
+if [[ -x "${AOC_ROOT}/lang/${AOC_LANG}/aoc-build" ]]; then
+    "${AOC_ROOT}/lang/${AOC_LANG}/aoc-build" "$@"
+elif [[ ! -r "${AOC_ROOT}/lang/${AOC_LANG}/Dockerfile" ]]; then
+    echo "no Dockerfile for language ${AOC_LANG}"
     exit 1
+else
+    # shellcheck source=/dev/null
+    if [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]]; then
+        source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
+    fi
+
+    # shellcheck disable=SC2086
+    docker build \
+        --file "${AOC_ROOT}/lang/${AOC_LANG}/Dockerfile" \
+        --tag "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
+        ${ADDITIONAL_FLAGS:-} \
+        "${AOC_ROOT}/lang/${AOC_LANG}"
 fi

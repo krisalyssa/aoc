@@ -4,11 +4,9 @@
 ## start a container for a language
 ##
 
+AOC_DRY_RUN=
 AOC_ROOT="$(dirname "$0")/.."
-
-# Source the shared utilities
-# shellcheck disable=SC1091
-source "${AOC_ROOT}/bin/utils.sh"
+AOC_VERBOSE=
 
 usage() {
     local exitcode=${1:-1}
@@ -29,6 +27,9 @@ usage() {
     echo "* -y -- year (defaults to current year)"
     echo "* -t -- tag for language Docker image (defaults to 'latest')"
     echo "* -d -- detach the container (run it in the background)"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
     echo ""
@@ -37,7 +38,10 @@ usage() {
     exit "${exitcode}"
 }
 
-while getopts ":dhl:t:y:" opt; do
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
+
+while getopts ":dhl:nt:vy:" opt; do
     case ${opt} in
         d) # detach
             DETACH=true
@@ -51,8 +55,16 @@ while getopts ":dhl:t:y:" opt; do
             AOC_LANG=${OPTARG}
             ;;
 
+        n) # dry run
+            export AOC_DRY_RUN=1
+            ;;
+
         t) # tag for lang image
-            AOC_TAG=${OPTARG}
+            export AOC_TAG=${OPTARG}
+            ;;
+
+        v) # verbose
+            export AOC_VERBOSE=1
             ;;
 
         y) # year

@@ -4,7 +4,9 @@
 ## stop a container for a language
 ##
 
+AOC_DRY_RUN=
 AOC_ROOT="$(dirname "$0")/.."
+AOC_VERBOSE=
 
 # Source the shared utilities
 # shellcheck disable=SC1091
@@ -27,13 +29,19 @@ usage() {
     echo "Options:"
     echo "* -l -- language"
     echo "* -y -- year (defaults to current year)"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
 
     exit "${exitcode}"
 }
 
-while getopts ":dhl:t:y:" opt; do
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
+
+while getopts ":dhl:nt:vy:" opt; do
     case ${opt} in
         h) # help
             usage 0
@@ -41,6 +49,14 @@ while getopts ":dhl:t:y:" opt; do
 
         l) # lang
             AOC_LANG=${OPTARG}
+            ;;
+
+        n) # dry run
+            export AOC_DRY_RUN=1
+            ;;
+
+        v) # verbose
+            export AOC_VERBOSE=1
             ;;
 
         y) # year
