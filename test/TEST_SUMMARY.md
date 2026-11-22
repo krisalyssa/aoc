@@ -7,6 +7,7 @@ This directory contains comprehensive unit tests for the shell scripts in the `b
 ## Test Files Created
 
 ### 1. `simple-test.sh`
+
 - **Purpose**: Basic existence, syntax, and structural validation
 - **Tests**:
   - Script existence and executability
@@ -15,6 +16,7 @@ This directory contains comprehensive unit tests for the shell scripts in the `b
   - Expected patterns in script content
 
 ### 2. `functional-test.sh`
+
 - **Purpose**: Functional testing of core utility functions
 - **Tests**:
   - `container_name` function correctness
@@ -23,6 +25,7 @@ This directory contains comprehensive unit tests for the shell scripts in the `b
   - Usage of essential patterns like `getopts`
 
 ### 3. `logic-test.sh`
+
 - **Purpose**: Validation of argument parsing and business logic
 - **Tests**:
   - Year validation (2015 to current year)
@@ -32,24 +35,28 @@ This directory contains comprehensive unit tests for the shell scripts in the `b
   - Language directory validation
 
 ### 4. `complete-test.sh`
+
 - **Purpose**: Complete end-to-end test suite
 - **Tests all the above with proper error handling**
 
 ## Key Features Tested
 
 ### Script Structure
+
 - All scripts are executable and exist
 - Proper use of `getopts` for argument parsing
 - Correct sourcing of `utils.sh`
 - Use of environment variables (`AOC_ROOT`, etc.)
 
 ### Validation Logic
+
 - Year range validation (2015 to current year)
 - Day range validation (1-25)
 - Current day validation to prevent future dates
 - Solution verification using JSON processing with `jq`
 
 ### Utility Functions
+
 - `run_cmd` - Executes commands with dry-run support
 - `container_name` - Generates container names consistently
 - `container_exec` - Executes commands in containers
@@ -81,7 +88,7 @@ For full testing, integration tests with actual containers would be required.
 ```bash
 # Run individual tests
 ./simple-test.sh
-./functional-test.sh  
+./functional-test.sh
 ./logic-test.sh
 ./complete-test.sh
 

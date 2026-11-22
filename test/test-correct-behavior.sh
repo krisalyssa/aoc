@@ -34,21 +34,22 @@ echo "If run_cmd executes 'echo \"result\"':"
 echo "- Normal mode: returns 'result' (command output only)"
 echo "- Verbose mode: shows 'running: echo \"result\"' + returns 'result'"
 
+# shellcheck disable=SC1091
 source "./bin/utils.sh"
 
 echo ""
 echo "=== Current Actual Behavior ==="
-AOC_DRY_RUN=
-AOC_VERBOSE=
+export AOC_DRY_RUN=
+export AOC_VERBOSE=
 
 echo "Normal mode test:"
 result=$(run_cmd "echo 'test'" 2>&1)
-echo "Result: '$result'"
+echo "Result: '${result}'"
 echo "Expected: 'test' (but this is wrong for tests)"
 
 echo ""
-AOC_VERBOSE=1
+export AOC_VERBOSE=1
 echo "Verbose mode test:"
 result=$(run_cmd "echo 'test'" 2>&1)
-echo "Result: '$result'"
+echo "Result: '${result}'"
 echo "Expected: 'running: echo 'test'' + 'test'"
