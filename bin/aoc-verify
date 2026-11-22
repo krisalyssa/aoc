@@ -5,7 +5,11 @@
 ## NOTE: expects jq in the path
 ##
 
+AOC_DAY=
+AOC_DRY_RUN=
 AOC_ROOT="$(dirname "$0")/.."
+AOC_VERBOSE=
+AOC_YEAR=
 
 usage() {
     local exitcode=${1:-1}
@@ -16,8 +20,8 @@ usage() {
         langs+=("$(basename "$(dirname "${filename}")")")
     done < <(find "${AOC_ROOT}/lang" -type f -name 'Dockerfile' -print0 | sort -z)
 
-    echo "usage: aoc-verify -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ]"
-    echo "       aoc-verify [ -y <year> ] [ -d <day> ] [ -t <tag> ] <language>"
+    echo "usage: aoc-verify -l <language> [ -y <year> ] [ -d <day> ] [ -t <tag> ] [ -n ] [ -v ]"
+    echo "       aoc-verify [ -y <year> ] [ -d <day> ] [ -t <tag> ] [ -n ] [ -v ] <language>"
     echo ""
     echo "Runs code for a year, day, and language and compares it to known solutions. Useful for testing code in new languages or smoke testing changes."
     echo ""
@@ -26,16 +30,29 @@ usage() {
     echo "* -y -- year (defaults to current year) ('all' is also permitted)"
     echo "* -d -- day (defaults to current day) ('all' is also permitted)"
     echo "* -t -- tag for language Docker image (defaults to 'latest')"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
 
     exit "${exitcode}"
 }
 
-while getopts ":d:hl:t:y:" opt; do
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
+
+# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
+# shellcheck disable=SC2312
+CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
+# for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
+# shellcheck disable=SC2312
+CURRENT_DAY=$(date -I | cut -d '-' -f 3)
+
+while getopts ":d:hl:nt:vy:" opt; do
     case ${opt} in
         d) # day
-            AOC_DAY=${OPTARG}
+            export AOC_DAY=${OPTARG}
             ;;
 
         h) # help
@@ -43,15 +60,23 @@ while getopts ":d:hl:t:y:" opt; do
             ;;
 
         l) # lang
-            AOC_LANG=${OPTARG}
+            export AOC_LANG=${OPTARG}
+            ;;
+
+        n) # dry run
+            export AOC_DRY_RUN=1
             ;;
 
         t) # tag for lang image
-            AOC_TAG=${OPTARG}
+            export AOC_TAG=${OPTARG}
+            ;;
+
+        v) # verbose
+            export AOC_VERBOSE=1
             ;;
 
         y) # year
-            AOC_YEAR=${OPTARG}
+            export AOC_YEAR=${OPTARG}
             ;;
 
         \?)
@@ -69,17 +94,10 @@ while getopts ":d:hl:t:y:" opt; do
 done
 shift $((OPTIND - 1))
 
-# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
-# shellcheck disable=SC2312
-CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
-# for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
-# shellcheck disable=SC2312
-CURRENT_DAY=$(date -I | cut -d '-' -f 3)
-
 export AOC_LANG=${AOC_LANG:-$1}
 export AOC_TAG=${AOC_TAG:-latest}
-export AOC_YEAR=
-export AOC_DAY=
+export AOC_YEAR=${AOC_YEAR:-${CURRENT_YEAR}}
+# export AOC_DAY=${AOC_DAY:-${CURRENT_DAY}}
 
 if [[ -z "${AOC_LANG}" ]]; then
     usage
@@ -89,7 +107,7 @@ elif [[ ! -d "${AOC_ROOT}/lang/${AOC_LANG}" ]]; then
 fi
 
 if [[ -z "${AOC_YEAR}" ]]; then
-    AOC_YEAR="${CURRENT_YEAR}"
+    usage
 elif ((AOC_YEAR < 2015 || AOC_YEAR > CURRENT_YEAR)); then
     echo "year out of range"
     usage
@@ -103,7 +121,7 @@ if [[ -z "${AOC_DAY}" ]]; then
     fi
 elif [[ "${AOC_DAY}" == "all" ]]; then
     # run for all days
-    true
+    :
 else
     # strip leading zero, if any, for proper numeric comparisons
     AOC_DAY=$((AOC_DAY + 0))
@@ -132,19 +150,17 @@ else
         fi
     fi
 
-    # shellcheck source=/dev/null
+    # shellcheck disable=SC1090
     [[ -r "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc" ]] && source "${AOC_ROOT}/lang/${AOC_LANG}/.aocrc"
 
     for year in ${AOC_YEAR}; do
-        CONTAINER_NAME="aoc-${AOC_LANG}-${year}"
-
-        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/${AOC_LANG}" ]] || {
-            echo "${AOC_LANG} not initialized for ${AOC_YEAR}"
+        [[ -d "${AOC_ROOT}/years/${year}/${AOC_LANG}" ]] || {
+            echo "${AOC_LANG} not initialized for ${year}"
             exit 1
         }
 
-        [[ -d "${AOC_ROOT}/years/${AOC_YEAR}/data" ]] || {
-            echo "data not downloaded for ${AOC_YEAR}"
+        [[ -d "${AOC_ROOT}/years/${year}/data" ]] || {
+            echo "data not downloaded for ${year}"
             exit 1
         }
 
@@ -152,24 +168,18 @@ else
             # now that we're done comparing numbers, force day to two digits
             day=$(printf "%02d" "${day}")
 
-            OUTPUT=$(
-                # shellcheck disable=SC2086
-                docker run \
-                    --env AOC_DAY \
-                    --env AOC_LANG \
-                    --env AOC_TAG \
-                    --env AOC_YEAR \
-                    --interactive \
-                    --mount "type=bind,src=${AOC_ROOT}/years/${year}/${AOC_LANG},dst=/aoc/src" \
-                    --mount "type=bind,src=${AOC_ROOT}/years/${year}/data,dst=/aoc/data" \
-                    ${ADDITIONAL_MOUNTS:-} \
-                    --name "${CONTAINER_NAME}" \
-                    --rm \
-                    --tty \
-                    ${ADDITIONAL_FLAGS:-} \
-                    "ghcr.io/krisalyssa/aoc/aoc-${AOC_LANG}:${AOC_TAG}" \
-                    -c "bin/run ${day}"
-            )
+            case $(container_state "${year}" "${AOC_LANG}") in
+                running)
+                    OUTPUT=$(container_exec run "${year}" "${AOC_LANG}" "${day}" "${AOC_TAG}")
+                    ;;
+
+                stopped)
+                    OUTPUT=$(container_run run "${year}" "${AOC_LANG}" "${day}" "${AOC_TAG}")
+                    ;;
+
+                *)
+                    ;;
+            esac
 
             part_1=$(echo "${OUTPUT}" | jq -r ".day_${day}[0]")
             solution_1=$(jq -r ".day_${day}[0]" "${AOC_ROOT}/years/${year}/solutions.json")
