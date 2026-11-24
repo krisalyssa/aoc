@@ -38,7 +38,7 @@ usage() {
 # shellcheck disable=SC1091
 source "${AOC_ROOT}/bin/utils.sh"
 
-while getopts ":hl:t:y:" opt; do
+while getopts ":hl:nt:vy:" opt; do
     case ${opt} in
         h) # help
             usage 0
