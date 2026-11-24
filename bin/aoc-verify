@@ -42,13 +42,6 @@ usage() {
 # shellcheck disable=SC1091
 source "${AOC_ROOT}/bin/utils.sh"
 
-# for Linux? CURRENT_YEAR=$(date --iso-8601 | cut -d '-' -f 1)
-# shellcheck disable=SC2312
-CURRENT_YEAR=$(date -I | cut -d '-' -f 1)
-# for Linux? CURRENT_DAY=$(date --iso-8601 | cut -d '-' -f 3)
-# shellcheck disable=SC2312
-CURRENT_DAY=$(date -I | cut -d '-' -f 3)
-
 while getopts ":d:hl:nt:vy:" opt; do
     case ${opt} in
         d) # day
@@ -93,6 +86,9 @@ while getopts ":d:hl:nt:vy:" opt; do
     esac
 done
 shift $((OPTIND - 1))
+
+CURRENT_YEAR=$(get_current_year)
+CURRENT_DAY=$(get_current_day)
 
 export AOC_LANG=${AOC_LANG:-$1}
 export AOC_TAG=${AOC_TAG:-latest}
@@ -173,8 +169,8 @@ else
                     OUTPUT=$(container_exec run "${year}" "${AOC_LANG}" "${day}" "${AOC_TAG}")
                     ;;
 
-                stopped)
-                    OUTPUT=$(container_run run "${year}" "${AOC_LANG}" "${day}" "${AOC_TAG}")
+                stopped | null)
+                    OUTPUT=$(container_run "${AOC_ROOT}" run "${year}" "${AOC_LANG}" "${day}" "${AOC_TAG}")
                     ;;
 
                 *)

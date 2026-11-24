@@ -4,7 +4,9 @@
 ## start a REPL
 ##
 
+AOC_DRY_RUN=
 AOC_ROOT="$(dirname "$0")/.."
+AOC_VERBOSE=
 
 usage() {
     local exitcode=${1:-1}
@@ -24,13 +26,19 @@ usage() {
     echo "* -l -- language"
     echo "* -y -- year (defaults to current year) ('none' is also permitted)"
     echo "* -t -- tag for language Docker image (defaults to 'latest')"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
 
     exit "${exitcode}"
 }
 
-while getopts ":hl:t:y:" opt; do
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
+
+while getopts ":hl:nt:vy:" opt; do
     case ${opt} in
         h) # help
             usage 0
@@ -40,8 +48,16 @@ while getopts ":hl:t:y:" opt; do
             AOC_LANG=${OPTARG}
             ;;
 
+        n) # dry run
+            export AOC_DRY_RUN=1
+            ;;
+
         t) # tag for lang image
-            AOC_TAG=${OPTARG}
+            export AOC_TAG=${OPTARG}
+            ;;
+
+        v) # verbose
+            export AOC_VERBOSE=1
             ;;
 
         y) # year

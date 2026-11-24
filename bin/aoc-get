@@ -1,48 +1,46 @@
 #!/usr/bin/env bash
 
 ##
-## pull data
+## pull data from adventofcode.com
 ##
 
+AOC_DAY=
+AOC_DRY_RUN=
+AOC_FORCE=
 AOC_ROOT="$(dirname "$0")/.."
-
-# Source the shared utilities
-# shellcheck disable=SC1091
-source "${AOC_ROOT}/bin/utils.sh"
+AOC_SESSION_TOKEN=
+AOC_VERBOSE=
+AOC_YEAR=
 
 usage() {
     local exitcode=${1:-1}
 
-    echo "usage: aoc-get [ -y <year> [ -d <day> ] ] [ -n ] [ -f ] [ -v ] [ -q ]"
+    echo "usage: aoc-get [ -y <year> [ -d <day> ] ] [ -n ] [ -f ] [ -v ]"
     echo ""
     echo "Gets data files."
     echo ""
     echo "Options:"
     echo "* -y -- year, or 'all' (defaults to current year)"
     echo "* -d -- day, or 'all' (defaults to current day)"
-    echo "* -n -- dry run (show, don't do)"
     echo "* -f -- force (download a data file even if it exists locally)"
-    echo "* -v -- increase verbosity"
-    echo "* -q -- decrease verbosity"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
 
     exit "${exitcode}"
 }
 
-AOC_DAY=
-AOC_YEAR=
-DRY_RUN=
-FORCE=
-SESSION_TOKEN=
-VERBOSE=1
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
 
 while getopts ":d:fhnqvy:" opt; do
     case ${opt} in
         d) # day
-            AOC_DAY=${OPTARG}
+            export AOC_DAY=${OPTARG}
             ;;
 
         f) # force
-            FORCE=true
+            export AOC_FORCE=true
             ;;
 
         h) # help
@@ -50,19 +48,15 @@ while getopts ":d:fhnqvy:" opt; do
             ;;
 
         n) # dry run
-            DRY_RUN=true
-            ;;
-
-        q) # quiet
-            VERBOSE=0
+            export AOC_DRY_RUN=true
             ;;
 
         v) # verbose
-            VERBOSE=$((VERBOSE + 1))
+            export AOC_VERBOSE=1
             ;;
 
         y) # year
-            AOC_YEAR=${OPTARG}
+            export AOC_YEAR=${OPTARG}
             ;;
 
         \?)
@@ -99,8 +93,8 @@ elif [[ "${AOC_DAY}" != "all" ]]; then
     fi
 fi
 
-[[ -z "${SESSION_TOKEN}" && -r ./.token ]] && SESSION_TOKEN=$(cat ./.token)
-if [[ -z "${SESSION_TOKEN}" ]]; then
+[[ -z "${AOC_SESSION_TOKEN}" && -r ./.token ]] && AOC_SESSION_TOKEN=$(cat ./.token)
+if [[ -z "${AOC_SESSION_TOKEN}" ]]; then
     echo "cannot find session token -- are you logged in?"
     usage
 fi
@@ -124,13 +118,13 @@ fetch() {
     outfile=$(mktemp)
     url=$(data_url "${year}" "${day}")
 
-    if [[ -n "${DRY_RUN}" ]]; then
+    if [[ -n "${AOC_DRY_RUN}" ]]; then
         echo "curl --request GET --cookie \"session=***\" --location --output \"${fn}\" --show-error --silent --write-out \"%{http_code}\" --url \"${url}\""
     else
         status_code=$(
             curl \
                 --request GET \
-                --cookie "session=${SESSION_TOKEN}" \
+                --cookie "session=${AOC_SESSION_TOKEN}" \
                 --location \
                 --output "${outfile}" \
                 --show-error \
@@ -213,7 +207,7 @@ maybe_fetch() {
 
     echo -n "${year} day ${day}..."
 
-    if [[ ! -f "${fn}" || -n "${FORCE}" ]]; then
+    if [[ ! -f "${fn}" || -n "${AOC_FORCE}" ]]; then
         fetch "${year}" "${day}"
         echo " done."
     else
@@ -229,7 +223,7 @@ verbose() {
 verbose_gt() {
     local level=$1
     shift
-    [[ ${VERBOSE} -gt ${level} ]] && echo "$*"
+    [[ ${AOC_VERBOSE} -gt ${level} ]] && echo "$*"
 }
 
 get_data "${AOC_YEAR}" "${AOC_DAY}"

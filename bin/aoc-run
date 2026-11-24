@@ -5,11 +5,9 @@
 ## if there is a container already running, use it?
 ##
 
-AOC_ROOT="$(dirname "${0}")/.."
-
-# Source the shared utilities
-# shellcheck disable=SC1091
-source "${AOC_ROOT}/bin/utils.sh"
+AOC_DRY_RUN=
+AOC_ROOT="$(dirname "$0")/.."
+AOC_VERBOSE=
 
 usage() {
     local exitcode=${1:-1}
@@ -30,13 +28,19 @@ usage() {
     echo "* -y -- year (defaults to current year)"
     echo "* -d -- day (defaults to current day)"
     echo "* -t -- tag for language Docker image (defaults to 'latest')"
+    echo "* -h -- help"
+    echo "* -n -- dry run"
+    echo "* -v -- verbose output"
     echo ""
     echo "<language> must be one of: " "${langs[@]}"
 
     exit "${exitcode}"
 }
 
-while getopts ":d:hl:t:y:" opt; do
+# shellcheck disable=SC1091
+source "${AOC_ROOT}/bin/utils.sh"
+
+while getopts ":d:hl:nt:vy:" opt; do
     case ${opt} in
         d) # day
             AOC_DAY=${OPTARG}
@@ -45,12 +49,21 @@ while getopts ":d:hl:t:y:" opt; do
         h) # help
             usage 0
             ;;
+
         l) # lang
             AOC_LANG=${OPTARG}
             ;;
 
+        n) # dry run
+            export AOC_DRY_RUN=1
+            ;;
+
         t) # tag for lang image
-            AOC_TAG=${OPTARG}
+            export AOC_TAG=${OPTARG}
+            ;;
+
+        v) # verbose
+            export AOC_VERBOSE=1
             ;;
 
         y) # year

@@ -86,21 +86,19 @@ container_run() {
     if command -v container > /dev/null 2>&1; then
         cmd=$(
             cat << EOF
-container start "${container_name}"
-EOF
-        )
-        run_cmd "${cmd}"
-
-        cmd=$(
-            cat << EOF
-container exec \
+container run \
     --env AOC_LANG="${aoc_lang}" \
     --env AOC_TAG="${aoc_tag}" \
     --env AOC_YEAR="${aoc_year}" \
     --interactive \
     --tty \
     ${ADDITIONAL_FLAGS:-} \
-    "${container_name}" "bin/${aoc_script}" "${aoc_day}"
+    --name "${container_name}" \
+    --mount "type=bind,src=${aoc_root}/years/${aoc_year}/${aoc_lang},dst=/aoc/src" \
+    --mount "type=bind,src=${aoc_root}/years/${aoc_year}/data,dst=/aoc/data" \
+    ${ADDITIONAL_MOUNTS:-} \
+    "ghcr.io/krisalyssa/aoc/aoc-${aoc_lang}:${aoc_tag}" \
+    -c "bin/${aoc_script} ${aoc_day}"
 EOF
         )
         run_cmd "${cmd}"
@@ -126,6 +124,7 @@ docker run \
 EOF
         )
         run_cmd "${cmd}"
+
     else
         echo "container CLI or docker CLI is required to run this script"
         exit 1

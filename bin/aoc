@@ -16,6 +16,7 @@ usage() {
     echo "Runs AoC commands."
     echo ""
     echo "Options:"
+    echo "* -h -- help"
     echo "* -n -- dry run"
     echo "* -v -- verbose output"
 }
